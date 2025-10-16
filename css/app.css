@@ -48,6 +48,7 @@
   height: 100%;
   object-fit: contain;
   pointer-events: none;
+  user-select: none;
   /* chạm vào vẫn bắt .piece */
   -webkit-user-drag: none;
   /* tắt kéo ảnh mặc định */
@@ -59,4 +60,23 @@
     width: 100vmin;
     height: 100vmin;
   }
+}
+body{
+    display: flex;
+    width: 900px;
+}
+#menu{
+  display: flex;          /* xếp ngang */
+  gap: 10px;              /* khoảng cách giữa nút */
+  align-items: center;
+  margin: 12px auto;      /* đặt ở giữa dưới bàn cờ */
+  flex-wrap: wrap;        /* màn nhỏ thì tự xuống dòng */
+  flex-direction: column;
+}
+:root[data-auth="guest"] .when-auth {display: none;}
+:root[data-auth="auth"] .when-guest {display: none;}
+#menu button{
+  flex: 0 0 auto;         /* không bị kéo giãn */
+  padding: 8px 12px;
+  white-space: nowrap;
 }

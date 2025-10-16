@@ -2,9 +2,11 @@ import {
     ref, push, get, set, remove, runTransaction, onDisconnect, onValue,
     query,
     limitToFirst, update,
-    orderByChild,
     serverTimestamp
 } from "firebase/database";
+import { goToRoom } from "./room";
+import { BOARD, PIECES_AT } from "./constants/piece";
+import { db } from "./firebase";
 export async function findGame({ db, auth }) {
 
     if (!auth) {
@@ -24,7 +26,7 @@ export async function findGame({ db, auth }) {
     window.addEventListener('beforeunload', cleanup);
     window.addEventListener('pagehide', cleanup);
 
-    onValue(matchIdRef, (snap) => {
+    onValue(matchIdRef, async (snap) => {
         const v = snap.val();
         if (v == null) return;
 
@@ -33,7 +35,9 @@ export async function findGame({ db, auth }) {
         window.addEventListener('pagehide', cleanup);
 
         alert('[MATCHED] ' + v);
-        stop();
+        await goToRoom(v);
+
+
     })
     await set(entryRef, {
         ts: Date.now(),
@@ -58,6 +62,12 @@ export async function findGame({ db, auth }) {
         if (!claimed)
             continue;
         const matchId = Date.now();
+        let board = {};
+        for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+                board[BOARD[i][j]] = PIECES_AT[i][j];
+            }
+        }
         const updates = {
             [`users/${uid}/matchId`]: matchId,
             [`users/${oppUid}/matchId`]: matchId,
@@ -66,15 +76,37 @@ export async function findGame({ db, auth }) {
             [`matches/${matchId}`]: {
                 a: uid,
                 b: oppUid,
-                createAt: serverTimestamp()
+                createAt: serverTimestamp(),
+                board,
+                turn: 'white',
+                lastMove: { from: '', to: '' }
             }
         };
+
         try { await onDisconnect(entryRef).cancel(); }
         catch { }
         await update(ref(db), updates);
+        //await createMatch(matchId);
         return;
     }
-
-
-
 }
+// async function createMatch(id) {
+//     let board = {};
+//     for (let i = 0; i < 8; i++) {
+//         for (let j = 0; j < 8; j++) {
+//             board[BOARD[i][j]] = PIECES_AT[i][j];
+//         }
+//     }
+//     console.log(board);
+//     try {
+//         const matchRef = ref(db, `matches/${id}`);
+//         await update(matchRef, {
+//             'board': board,
+//             'turn': 'white',
+//             'lastMove': { 'from': '', 'to': '' }
+//         });
+//     } catch (error) {
+//         console.log(error);
+//     }
+
+// }
