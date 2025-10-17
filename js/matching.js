@@ -1,12 +1,11 @@
 import {
-    ref, push, get, set, remove, runTransaction, onDisconnect, onValue,
+    ref, get, set, remove, runTransaction, onDisconnect, onValue,
     query,
     limitToFirst, update,
     serverTimestamp
 } from "firebase/database";
 import { goToRoom } from "./room";
 import { BOARD, PIECES_AT } from "./constants/piece";
-import { db } from "./firebase";
 export async function findGame({ db, auth }) {
 
     if (!auth) {
@@ -90,23 +89,3 @@ export async function findGame({ db, auth }) {
         return;
     }
 }
-// async function createMatch(id) {
-//     let board = {};
-//     for (let i = 0; i < 8; i++) {
-//         for (let j = 0; j < 8; j++) {
-//             board[BOARD[i][j]] = PIECES_AT[i][j];
-//         }
-//     }
-//     console.log(board);
-//     try {
-//         const matchRef = ref(db, `matches/${id}`);
-//         await update(matchRef, {
-//             'board': board,
-//             'turn': 'white',
-//             'lastMove': { 'from': '', 'to': '' }
-//         });
-//     } catch (error) {
-//         console.log(error);
-//     }
-
-// }
