@@ -1,7 +1,6 @@
-import { auth, db } from "./firebase.js";
-import { ref, set,  update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-import { getAuth, signInAnonymously, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-
+import { auth, db, provider } from "./firebase.js";
+import { ref, set,  update } from "firebase/database";
+import { getRedirectResult,signInAnonymously, signOut, onAuthStateChanged,signInWithRedirect } from "firebase/auth";
 async function logout() {
     try {
 
@@ -21,6 +20,23 @@ async function logout() {
         console.log("Loi khi dang xuat: ", error);
     }
 }
-export {
-     logout,onAuthStateChanged,signInAnonymously,set
-};
+document.addEventListener('DOMContentLoaded',()=>{
+    const btnGoogle=document.getElementById('btn-google');
+
+
+    getRedirectResult(auth).catch(()=>{});
+    btnGoogle?.addEventListener('click',async()=>{
+        btnGoogle.disable=true;
+        try {
+            await signInWithRedirect(auth,provider);
+        } catch (error) {
+            console.log(error.code);   
+        }
+        finally{
+            btnGoogle.disable=false;
+        }
+    })
+    onAuthStateChanged(auth,(user)=>{
+        alert('Dang nhap thanh cong');
+    })
+})
