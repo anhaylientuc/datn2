@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="css/online.css" />
+
+</head>
+
+<body>
+    <!-- <h2>Play Online</h2> -->
+    <header class="header">
+        <h1 class="header__title">Play Online</h1>
+    </header>
+    <main class="wrap">
+        <!-- User card -->
+        <div class="card when-auth" id="user-card" role="region" aria-label="User information">
+            <div class="card__row">
+                <span class="ic">
+                    <img src="/src/icons/user.png" />
+                </span>
+                <div class="stack">
+                    <div class="label">Logged in as:</div>
+                    <div class="value username">username</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Matchmaking card -->
+        <div class="card when-auth" id="mm-card" role="region" aria-label="Matchmaking">
+            <div class="timer">
+                <span class="ic">
+                    <img src="/src/icons/clock.png" />
+                </span>
+                <span class="time" id="time">00:00</span>
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary" id="btn-find">
+                    <img class="ic16" src="/src/icons/magnifying-glass.png" alt="" aria-hidden="true" />
+                    Find Game
+                </button>
+                <button class="btn btn-danger" id="btn-cancel">Cancel...</button>
+            </div>
+        </div>
+
+        <!-- Status card (ẩn mặc định; bật class .show bằng JS khi tìm thấy đối thủ) -->
+        <div class="card card--status when-auth" id="status-card" role="status" aria-live="polite">
+            <div class="status">
+                <div class="status__line">Opponent found!</div>
+                <div class="status__line">
+                    Connecting to room<span class="dotting" aria-hidden="true"></span>
+                </div>
+            </div>
+        </div>
+        <!-- Guest card (HIỆN mặc định) -->
+
+        <div class="card when-guest" id="guest-card" role="region" aria-label="Sign in">
+            <p><strong>Sign in to play online</strong></p>
+            <p class="muted">You need to sign in to join matchmaking and play online.</p>
+            <div class="row">
+                <button id="btn-google">
+                    <img class="ic16" src="src/icons/google.png" alt="" aria-hidden="true" />
+                    Sign in with Google
+                </button>
+                <button id="btn-guest">
+                    <img class="ic16" src="src/icons/person.png" alt="" aria-hidden="true" />
+                    Play as Guest
+                </button>
+            </div>
+            <small class="muted">
+                Why sign in? Save your ELO and match history, prevent cheating, and ensure fair rankings.
+            </small>
+        </div>
+
+        <div id="opponent-overplay"></div>
+        <div class="card card--matchfound when-auth" id="opponent-card" role="region" aria-label="Opponent found">
+            <div class="row header-row">
+                <span class="badge">MATCH FOUND</span>
+                <div class="muted">Room is preparing<span class="dotting" aria-hidden="true"></span></div>
+            </div>
+            <div class="vs">
+                <div class="player you" aria-label="You">
+                    <div class="avatar">
+                        <img id="you-avatar" src="/src/icons/user.png" alt="Your avatar" />
+                    </div>
+                    <div class="meta">
+                        <div class="name" id="you-name">You</div>
+                        <div class="elo" id="you-elo">ELO:</div>
+                    </div>
+                </div>
+                <div class="vs-center">
+                    <div class="vs-text">VS</div>
+                    <div class="muted small" id="match-conn">Connecting<span class="dotting" aria-hidden="true"></span>
+                    </div>
+                </div>
+                <div class="player opp" aria-label="Opponent">
+                    <div class="avatar">
+                        <img id="opp-avatar" src="/src/icons/user.png" alt="Opponent avatar" />
+                    </div>
+                    <div class="meta">
+                        <div class="name" id="opp-name">Opponent</div>
+                        <div class="elo" id="opp-elo">ELO:</div>
+                    </div>
+                </div>
+            </div>
+            <div class="actions footer-actions">
+                <button class="btn btn-danger" id="btn-cancel-found">Cancel</button>
+                <button class="btn btn-primary" id="btn-join-found">Go to room</button>
+            </div>
+        </div>
+    </main>
+
+
+
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/online.js"></script>
+
+
+</body>
+<footer class="tip">
+    Tip: Stay signed in to track your ELO.
+</footer>
+
+</html>

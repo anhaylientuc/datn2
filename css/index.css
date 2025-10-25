@@ -1,106 +1,70 @@
 :root{
-    --bg:  #0f1115;
-    --card: #151a23;
-    --muted: #9aa3b2;
-    --dash: #4f5d74;
-    --border: #263143;
-    --hover: #1c2433;
-    --shadown: 0 10px 30px rgba(0,0,0,.35);
+  --bg:#0f1115;--fg:#e6eaf2;--muted:#9aa3b2;
+  --card:#151a23; --border:#263143; --hover:#1b2332; --dash:#465572;
+  --accent:#2f81f7; --danger:#ef4444;
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+  --radius:16px;
 }
-*{ box-sizing: border-box; }
-html, body { height: 100%; }
+
+*{box-sizing: border-box;}
+html,body{height: 100%;}
 body{
-    margin: 0;
-    color: var(--fg);
-    background: radial-gradient(1200px 800px at 10% -10%, #1a2130 0%, #0f1115 60%) fixed;
-    font: 500 16px/1.55 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-    display: grid;
-    place-items: center;
-    padding: 16px;
-}
-/* ========= Layout ========= */
-
-.container{
-  display:none; /* đang tập trung thiết kế menu; khi cần bàn cờ thì bật lên */
-}
-
-#menu{
-    width: min(92vw,380px);
-
+  margin: 0; color: var(--fg);
+  background: radial-gradient(1200px 800px at 12% -10%, #1a2130 0%, #0f1115 60%) fixed;
+  font: 400 16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+  display: grid; place-items: center;
+  padding: 24px 20px;
 }
 
 
-/* ========= Card/menu kiểu nét đứt ========= */
-#menu > ul{
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    background: var(--card);
-    border: 1px dashed var(--dash);
-    border-radius: 16px;
-    box-shadow: var(--shadown);
-    overflow: hidden;
-}
-
-menu li{
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
-    border-bottom: 1px solid rgba(255,255,255,.05);
-    background: transparent;
-    user-select: none;
-    transition: background .15s, transform .05s, color .15s; 
-    cursor: pointer;
-}
-#menu li:last-child {
-  border-bottom: none;
-}
-#menu li:hover{ background:var(--hover); }
-#menu li:active{ transform: translateY(1px); }
-
-
-/* ========= Icon ========= */
-.ic{
-    width: 28px;
-    height: 28px;
-    align-items: center;
-    justify-content: center;
-    display: inline-flex;
-    flex: 0 0 28px;
-    border: 1px dashed var(--dash);
-    border-radius: 8px;
-    background: #121826;
-}
-.ic img{
-    width: 18px; height: 18px; display: block;
-    object-fit: contain;
-}
-
-/* ========= Typography ========= */
-#menu li{
-    font-weight: 600;
-    letter-spacing: .2px;
-
-}
-#menu li span.text-muted{color: var(--muted); font-weight: 500;}
-/* #board{
-  display:flex; flex-wrap:wrap;
-  width:min(90vmin, 540px);
-  height:min(90vmin, 540px);
+#menu{width: min(320px,92vw);}
+#menu>ul{
   list-style:none; margin:0; padding:0;
+  width:100%;
+  background:transparent; border:none; box-shadow:none;
+  display: grid;
+  gap: 10px;
 }
-#board .square{
-  flex:0 0 calc(100%/8);
-  aspect-ratio:1/1;
-  position:relative;
+#menu li{
+  display: flex; align-items: center; gap: 12px;
+  border: 1px dashed var(--dash);
+  border-radius: 12px;
+  background: #121826;
+  margin: 0;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: background .15s, transform .05s, color .15s;
+  
 }
-#board .square:nth-child(odd){ background:#EEEED2; }
-#board .square:nth-child(even){ background:#769656; }
+#menu li:hover{
+  background: var(--hover);
+  border-color: #566684;
+}
+#menu li:active{transform: translateY(1px);}
 
-/* ========= Responsive ========= */
-/* @media (max-width: 420px){
-  #menu{ width: min(94vw, 360px); }
-  .ic{ width:26px; height:26px; flex-basis:26px; }
-  .ic img{ width:16px; height:16px; }
-} */ 
+.ic{
+  width: 28px; height: 28px;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex: 0 0 28px;
+  border: 1px dashed var(--dash);
+  border-radius: 8px;
+  background: #121826;
+
+}
+.ic img{width:18px; height: 18px; display: block; object-fit: contain;}
+
+#menu li:focus-within{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(47,129,247,.25);
+}
+
+@media(max-width:420px){
+  body{padding: 16px;}
+  #menu > ul{border-radius: 12px;}
+  #menu li{padding: 12px;}
+}
+
+#menu .menu-link{
+  text-decoration: none;
+  color: inherit;
+}
