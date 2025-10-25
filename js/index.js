@@ -9,15 +9,15 @@ const btnLogout = $("#btn-logout");
 const btnFind = $("#btn-findgame");
 const timeEl = document.getElementById('timer');
 let busy = false;
-onAuthStateChanged(auth, user => {
-    document.documentElement.setAttribute("data-auth", user ? "auth" : "guest");
-    if (user) {
-        const entryRef = ref(db, `queue/entries/${user.uid}`);
-        onDisconnect(entryRef).remove();
-    }
-    [btnLogin, btnLogout, btnFind].forEach(b => b?.removeAttribute("disabled"));
-    busy = false;
-})
+// onAuthStateChanged(auth, user => {
+//     document.documentElement.setAttribute("data-auth", user ? "auth" : "guest");
+//     if (user) {
+//         const entryRef = ref(db, `queue/entries/${user.uid}`);
+//         onDisconnect(entryRef).remove();
+//     }
+//     [btnLogin, btnLogout, btnFind].forEach(b => b?.removeAttribute("disabled"));
+//     busy = false;
+// })
 
 btnLogin?.addEventListener("click", async () => {
     if (busy)

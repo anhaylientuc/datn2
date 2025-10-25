@@ -131,6 +131,9 @@ body{
 
 /* ============ Matchmaking card ============ */
 #mm-card{
+  display: none;
+}
+#mm-card.show{
   display: grid;
   gap: 12px;
 }
@@ -180,10 +183,13 @@ body{
 
 /* ============ Guest vs Auth visibility ============ */
 /* Mặc định: coi như guest; khi đăng nhập, JS thêm class .is-auth lên <body> */
-.when-auth{ display: none; }
-.when-guest{ display: block; }
-body.is-auth .when-auth{ display: block; }
-body.is-auth .when-guest{ display: none; }
+/* Mặc định: khách */
+.when-auth { display: none; }
+.when-guest { display: block; }
+
+/* Khi đã đăng nhập (body có .is-auth) */
+body.is-auth .when-auth { display: block; }
+body.is-auth .when-guest { display: none; }
 
 /* ============ MATCH FOUND modal ============ */
 #opponent-overplay{
