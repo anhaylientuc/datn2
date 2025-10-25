@@ -1,0 +1,1 @@
+import{h as n,i as d,a as t,p as s,j as c}from"./firebase-BGxR-Xyq.js";document.addEventListener("DOMContentLoaded",()=>{const e=document.getElementById("btn-google");n(t).catch(()=>{}),e==null||e.addEventListener("click",async()=>{e.disable=!0;try{await d(t,s)}catch(a){console.log(a.code)}finally{e.disable=!1}}),c(t,a=>{alert("Dang nhap thanh cong")})});

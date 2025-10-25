@@ -1,5 +1,4 @@
 import { db, auth, onDisconnect, ref, set } from "./firebase.js";
-import { logout, onAuthStateChanged, signInAnonymously } from "./auth.js";
 import { findGame } from "./matching.js";
 // DOM đã parse xong nên lấy được nút
 
