@@ -26,14 +26,12 @@ document.addEventListener('DOMContentLoaded',()=>{
 
     getRedirectResult(auth).catch(()=>{});
     btnGoogle?.addEventListener('click',async()=>{
-        btnGoogle.disable=true;
         try {
             await signInWithRedirect(auth,provider);
         } catch (error) {
             console.log(error.code);   
         }
         finally{
-            btnGoogle.disable=false;
         }
     })
     onAuthStateChanged(auth,(user)=>{
