@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <script type="module" crossorigin src="./assets/auth-D7aP3fUi.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/online-ukn4eduP.css">
+</head>
+
+<body>
+    <!-- <h2>Play Online</h2> -->
+    <header class="header">
+        <h1 class="header__title">Play Online</h1>
+    </header>
+    <main class="wrap">
+        <!-- User card -->
+        <div class="card when-auth" id="user-card" role="region" aria-label="User information">
+            <div class="card__row">
+                <span class="ic">
+                    <img src="./assets/user-oWpspHJN.png" />
+                </span>
+                <div class="stack">
+                    <div class="label">Logged in as:</div>
+                    <div class="value username">username</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Matchmaking card -->
+        <div class="card when-auth" id="mm-card" role="region" aria-label="Matchmaking">
+            <div class="timer">
+                <span class="ic">
+                    <img src="./assets/clock-Dh4bITzH.png" />
+                </span>
+                <span class="time" id="time">00:00</span>
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary" id="btn-find">
+                    <img class="ic16" src="./assets/magnifying-glass-CddyAZYo.png" alt="" aria-hidden="true" />
+                    Find Game
+                </button>
+                <button class="btn btn-danger" id="btn-cancel">Cancel...</button>
+            </div>
+        </div>
+
+        <!-- Status card (ẩn mặc định; bật class .show bằng JS khi tìm thấy đối thủ) -->
+        <div class="card card--status when-auth" id="status-card" role="status" aria-live="polite">
+            <div class="status">
+                <div class="status__line">Opponent found!</div>
+                <div class="status__line">
+                    Connecting to room<span class="dotting" aria-hidden="true"></span>
+                </div>
+            </div>
+        </div>
+        <!-- Guest card (HIỆN mặc định) -->
+
+        <div class="card when-guest" id="guest-card" role="region" aria-label="Sign in">
+            <p><strong>Sign in to play online</strong></p>
+            <p class="muted">You need to sign in to join matchmaking and play online.</p>
+            <div class="row">
+                <button id="btn-google">
+                    <img class="ic16" src="./assets/google-Bp_336oh.png" alt="" aria-hidden="true" />
+                    Sign in with Google
+                </button>
+                <button id="btn-guest">
+                    <img class="ic16" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAuJJREFUeJztmU1IVFEYhp/vio7Q/4wFThRERItolSRhhFT+LCxrFgW5lYIW7QzauStctHNhEq0qEqJcSUoLm2qTYARChKuyIbARjYqmpvu1sFoYMzrnnHsrPM/6vO9973vPnHPuHfB4PB6Px+PxeDyeVYjEeTFVhLFES6jaJdAEpIEQmFHkUSByR1q/PIwzU2wF6EhitwZcB20qP1LGRemW9sJ0HLliKUBHaps1CIeB9SuUzImGJ6S9mI0yF8RQwOKT12fAugqlc6LSGPVMCKI0B9BAb1D5zQMkNQgHXedZSqQF6GiiFThgbiDN+qD2sLtEfxJpAaFql7UHetpFllJEWoDYPP3fHnrIRZZSRL0GbHPgsdWBR0miLsDFLlPlwKMkURfw2tpBmXGQoyTR7gLKE2uPwN6jHJEWEBDc/Bc8yhHpSVAV0dFEdvnzfykkG7QV/t9dQAQVtBtYMJAvSBXdrjMtJfKjsLR9fSkSdlJZCR8kCDvkaOFVVLl+EXkBANJaHJdQGlF5vILRWRFpkJbiCsbaE+sHEQAdrT0SEnaJchDYDnwH3qjwNFC5LW2FsbgzeTye1YvbRXBgojpZrM8AnQL7WHyTW2Pp+gl4izKh6PBc9bt7nGv4Zp31J84KSPXnMgh9qO505VmCaUR68ufT912Y2RfQq0FyS+6KKD0O8lRCX342fYleCW1MrA9Cf+nmAS6mNucu25pYzYBUfy4Detc2hBUiJ21+DuYzYGCiGqHPWO8IUb3K0FSNqd64gGSxPhPDgrcsCjuS7zd0mupt1gDji7pGlOOmWuMCBBpMte6R/aZKmxmQttC6xjiLTQFqoXWN8VnAogCZMtc6xziLeQGikX6trQjBOItxAZuKn68pPDfVO2QyXzdv/De6cQHTF3YVJAg7gElTDwdMEoTHOLXnq6mB/cvQ0FRNanbjWeAMsBdYa+1Zno/AC4Rb+br5QZub93g8Ho/H4/F4PJ5Vyw9h1ca3GBkYjAAAAABJRU5ErkJggg==" alt="" aria-hidden="true" />
+                    Play as Guest
+                </button>
+            </div>
+            <small class="muted">
+                Why sign in? Save your ELO and match history, prevent cheating, and ensure fair rankings.
+            </small>
+        </div>
+
+        <div id="opponent-overplay"></div>
+        <div class="card card--matchfound when-auth" id="opponent-card" role="region" aria-label="Opponent found">
+            <div class="row header-row">
+                <span class="badge">MATCH FOUND</span>
+                <div class="muted">Room is preparing<span class="dotting" aria-hidden="true"></span></div>
+            </div>
+            <div class="vs">
+                <div class="player you" aria-label="You">
+                    <div class="avatar">
+                        <img id="you-avatar" src="./assets/user-oWpspHJN.png" alt="Your avatar" />
+                    </div>
+                    <div class="meta">
+                        <div class="name" id="you-name">You</div>
+                        <div class="elo" id="you-elo">ELO:</div>
+                    </div>
+                </div>
+                <div class="vs-center">
+                    <div class="vs-text">VS</div>
+                    <div class="muted small" id="match-conn">Connecting<span class="dotting" aria-hidden="true"></span>
+                    </div>
+                </div>
+                <div class="player opp" aria-label="Opponent">
+                    <div class="avatar">
+                        <img id="opp-avatar" src="./assets/user-oWpspHJN.png" alt="Opponent avatar" />
+                    </div>
+                    <div class="meta">
+                        <div class="name" id="opp-name">Opponent</div>
+                        <div class="elo" id="opp-elo">ELO:</div>
+                    </div>
+                </div>
+            </div>
+            <div class="actions footer-actions">
+                <button class="btn btn-danger" id="btn-cancel-found">Cancel</button>
+                <button class="btn btn-primary" id="btn-join-found">Go to room</button>
+            </div>
+        </div>
+    </main>
+
+
+
+
+
+</body>
+<footer class="tip">
+    Tip: Stay signed in to track your ELO.
+</footer>
+
+</html>
