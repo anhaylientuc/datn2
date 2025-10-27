@@ -6,6 +6,7 @@ import {
 } from "firebase/database";
 import { goToRoom } from "./room";
 import { BOARD, PIECES_AT } from "./constants/piece";
+const offMatch=null;
 export async function findGame({ db, auth }) {
 
     if (!auth) {
@@ -19,37 +20,40 @@ export async function findGame({ db, auth }) {
     const entryRef = ref(db, `queue/entries/${uid}`)
     const matchIdRef = ref(db, `users/${uid}/matchId`);
 
+    // --- onDisconnect: tự xóa entry khi tab đóng ---
     await onDisconnect(entryRef).remove();
 
+    // --- cleanup handler (đăng ký 1 lần, có thể gỡ) ---
     const cleanup = () => { remove(entryRef); };
     window.addEventListener('beforeunload', cleanup);
     window.addEventListener('pagehide', cleanup);
 
-    onValue(matchIdRef, async (snap) => {
+    // --- lắng nghe khi có matchId, nhớ giữ off() để gỡ ---
+
+    offMatch=    onValue(matchIdRef, async (snap) => {
         const v = snap.val();
         if (v == null) return;
 
         onDisconnect(entryRef).cancel();
         window.addEventListener('beforeunload', cleanup);
         window.addEventListener('pagehide', cleanup);
+        offMatch();
+
 
         alert('[MATCHED] ' + v);
         await goToRoom(v);
 
 
     })
-    await set(entryRef, {
-        ts: Date.now(),
-        claimedBy: null
-    });
-    const getCandidatesQ = query(entriesRef, limitToFirst(5)); const listSnap = await get(getCandidatesQ);
+    await set(entryRef, {ts: Date.now(),claimedBy: null});
+    const getCandidatesQ = query(entriesRef, limitToFirst(5)); 
+    const listSnap = await get(getCandidatesQ);
     if (!listSnap.exists())
         return;
     const entries = listSnap.val();
     const pairs = Object.entries(entries)
         .filter(([k, v]) => k != uid);
     for (const [oppUid, oppData] of pairs) {
-        const oppRef = ref(db, `queue/entries/${oppUid}`);
         const oppClaimRef = ref(db, `queue/entries/${oppUid}/claimedBy`);
 
         const tx = await runTransaction(oppClaimRef, cur => {
@@ -88,4 +92,27 @@ export async function findGame({ db, auth }) {
         //await createMatch(matchId);
         return;
     }
+}
+export async function cancelGame({db,auth})
+{
+    const uid=auth?.currentUser?.uid;
+    if(!uid)
+        return;
+    if(offMatch){
+        offMatch();
+        offMatch=null;
+    }
+    const entryRef=ref(db,`queue/entries/${uid}`);
+    try{
+        await onDisconnect(entryRef).cancel();
+    }catch(error){
+
+    }
+    try {
+        remove(entryRef);
+    } catch (error) {
+        
+    }
+    console.log("Canceled queue and listener removed ");
+
 }

@@ -131,9 +131,6 @@ body{
 
 /* ============ Matchmaking card ============ */
 #mm-card{
-  display: none;
-}
-#mm-card.show{
   display: grid;
   gap: 12px;
 }
@@ -164,17 +161,24 @@ body{
 
 /* Dotting animation: "Connecting…" */
 .dotting{
-  display: inline-block;
+  display: block;
   width: 1.5em;
   overflow: hidden;
+  margin-left: .35em;
 }
 .dotting::after{
-  content: "…";
-  animation: dot 1.2s steps(3, end) infinite;
+  content:"...";           /* 3 ký tự dấu chấm, KHÔNG dùng “…” */
+  display: block;
+  width:0ch;               /* bắt đầu 0 ký tự */
+  overflow:hidden;
+  animation: dot 1.2s steps(3,end) infinite;
 }
 @keyframes dot{
-  0%{ width: 0 }
-  100%{ width: 1.5em }
+  from{width: 0ch;}
+  to{width: 3ch;}
+}
+@media(prefers-reduced-motion: reduce){
+  .dotting::after{animation: none;}
 }
 
 /* Ẩn status-card mặc định; khi JS thêm .show thì hiện */
@@ -360,5 +364,19 @@ footer.tip{
   background: #f9fafb;
   border-color: #d1d5db;
 }
+body.auth-pending .when-auth,
+body.auth-pending .when-guest {display: none;}
 
-
+#btn-find.is-finding{
+  display: none;
+}
+#btn-cancel.is-finding{
+  display: inline-flex;
+  align-items: baseline;
+  gap: .35em;                  /* khoảng cách giữa "Cancel" và "..." */
+  line-height: 1;
+  white-space: nowrap;
+}
+#btn-cancel{
+  display: none;
+}

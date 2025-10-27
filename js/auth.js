@@ -1,3 +1,4 @@
+document.body.classList.add('auth-pending');
 import { auth, db, provider } from "./firebase.js";
 import { ref, set, update } from "firebase/database";
 import { getRedirectResult, signInAnonymously, signOut, onAuthStateChanged, signInWithRedirect, signInWithPopup } from "firebase/auth";
@@ -47,8 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })
     onAuthStateChanged(auth, (user) => {
+        document.body.classList.remove('auth-pending');
         if (user) {
-            console.log(user)
             document.body.classList.add('is-auth');
             const displayName = user.displayName || user.email || 'You';
             if (nameEl) nameEl.textContent = displayName;
