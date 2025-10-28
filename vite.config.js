@@ -9,6 +9,7 @@ export default defineConfig({
       input: {
         main:   resolve(__dirname, 'index.html'),
         online: resolve(__dirname, 'online.html'), // ép build thêm trang này
+        room: resolve(__dirname, 'room.html'),
       },
     },
   },

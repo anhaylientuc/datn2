@@ -2,11 +2,10 @@ import {
     ref, get, set, remove, runTransaction, onDisconnect, onValue,
     query,
     limitToFirst, update,
-    serverTimestamp
+    serverTimestamp,
 } from "firebase/database";
-import { goToRoom } from "./room";
 import { BOARD, PIECES_AT } from "./constants/piece";
-const offMatch=null;
+let offMatch = null;
 export async function findGame({ db, auth }) {
 
     if (!auth) {
@@ -28,90 +27,103 @@ export async function findGame({ db, auth }) {
     window.addEventListener('beforeunload', cleanup);
     window.addEventListener('pagehide', cleanup);
 
+
+    const teardown=async()=>{
+        try{await onDisconnect(entryRef).cancel();}catch{}
+        if(offMatch){offMatch();offMatch=null;}
+        window.removeEventListener('beforeunload',cleanup);
+        window.removeEventListener('pagehide',cleanup);
+    }
     // --- lắng nghe khi có matchId, nhớ giữ off() để gỡ ---
+    const matchedId = await new Promise(async (resolve) => {
+        offMatch=onValue(matchIdRef, async (snap) => {
+            const v = snap.val();
+            if (v == null) return;
 
-    offMatch=    onValue(matchIdRef, async (snap) => {
-        const v = snap.val();
-        if (v == null) return;
+            await teardown();
 
-        onDisconnect(entryRef).cancel();
-        window.addEventListener('beforeunload', cleanup);
-        window.addEventListener('pagehide', cleanup);
-        offMatch();
+            alert('[MATCHED] ' + v);
+            resolve(v);
+        })
+        // vào hàng chờ
+        await set(entryRef, { ts: Date.now(), claimedBy: null });
+        const getCandidatesQ = query(entriesRef, limitToFirst(5));
+        const listSnap = await get(getCandidatesQ);
+        if (!listSnap.exists())
+            return;
+        const entries = listSnap.val();
+        const pairs = Object.entries(entries)
+            .filter(([k, v]) => k != uid);
+        for (const [oppUid, oppData] of pairs) {
+            const oppClaimRef = ref(db, `queue/entries/${oppUid}/claimedBy`);
 
+            const tx = await runTransaction(oppClaimRef, cur => {
+                if (cur == null)
+                    return uid;
+                return cur;
+            }, { applyLocally: false })
+            const claimed = tx.committed && tx.snapshot.val() === uid;
+            if (!claimed)
+                continue;
 
-        alert('[MATCHED] ' + v);
-        await goToRoom(v);
-
-
-    })
-    await set(entryRef, {ts: Date.now(),claimedBy: null});
-    const getCandidatesQ = query(entriesRef, limitToFirst(5)); 
-    const listSnap = await get(getCandidatesQ);
-    if (!listSnap.exists())
-        return;
-    const entries = listSnap.val();
-    const pairs = Object.entries(entries)
-        .filter(([k, v]) => k != uid);
-    for (const [oppUid, oppData] of pairs) {
-        const oppClaimRef = ref(db, `queue/entries/${oppUid}/claimedBy`);
-
-        const tx = await runTransaction(oppClaimRef, cur => {
-            if (cur == null)
-                return uid;
-            return cur;
-        }, { applyLocally: false })
-        const claimed = tx.committed && tx.snapshot.val() === uid;
-        if (!claimed)
-            continue;
-        const matchId = Date.now();
-        let board = {};
-        for (let i = 0; i < 8; i++) {
-            for (let j = 0; j < 8; j++) {
-                board[BOARD[i][j]] = PIECES_AT[i][j];
+            // nếu trong lúc claim mình đã bị match bởi người khác -> dừng
+            const myMatchSnap=await get(matchIdRef);
+            if(myMatchSnap.exists()){
+                await teardown();
+                resolve(myMatchSnap.val());
+                return;
             }
+
+
+            // tạo match
+            const matchId = Date.now();
+            let board = {};
+            for (let i = 0; i < 8; i++) {
+                for (let j = 0; j < 8; j++) {
+                    board[BOARD[i][j]] = PIECES_AT[i][j];
+                }
+            }
+            const updates = {
+                [`users/${uid}/matchId`]: matchId,
+                [`users/${oppUid}/matchId`]: matchId,
+                [`queue/entries/${uid}`]: null,
+                [`queue/entries/${oppUid}`]: null,
+                [`matches/${matchId}`]: {
+                    a: uid,
+                    b: oppUid,
+                    createAt: serverTimestamp(),
+                    board,
+                    turn: 'white',
+                    lastMove: { from: '', to: '' }
+                }
+            };
+
+            try { await onDisconnect(entryRef).cancel(); }
+            catch { }
+            await update(ref(db), updates);
+            return;
         }
-        const updates = {
-            [`users/${uid}/matchId`]: matchId,
-            [`users/${oppUid}/matchId`]: matchId,
-            [`queue/entries/${uid}`]: null,
-            [`queue/entries/${oppUid}`]: null,
-            [`matches/${matchId}`]: {
-                a: uid,
-                b: oppUid,
-                createAt: serverTimestamp(),
-                board,
-                turn: 'white',
-                lastMove: { from: '', to: '' }
-            }
-        };
-
-        try { await onDisconnect(entryRef).cancel(); }
-        catch { }
-        await update(ref(db), updates);
-        //await createMatch(matchId);
-        return;
-    }
+    });
+    return matchedId??null;
 }
-export async function cancelGame({db,auth})
-{
-    const uid=auth?.currentUser?.uid;
-    if(!uid)
+export async function cancelGame({ db, auth }) {
+    const uid = auth?.currentUser?.uid;
+    if (!uid)
         return;
-    if(offMatch){
+    if (offMatch) {
         offMatch();
-        offMatch=null;
+        offMatch = null;
     }
-    const entryRef=ref(db,`queue/entries/${uid}`);
-    try{
+    const entryRef = ref(db, `queue/entries/${uid}`);
+    try {
         await onDisconnect(entryRef).cancel();
-    }catch(error){
+    } catch (error) {
 
     }
     try {
-        remove(entryRef);
+        await remove(entryRef);
     } catch (error) {
-        
+
     }
     console.log("Canceled queue and listener removed ");
 

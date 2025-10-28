@@ -1,5 +1,6 @@
 import { db,auth } from "./firebase";
 import { cancelGame, findGame } from "./matching";
+import { goToRoom } from "./room";
 let sec=0;
 let timerId=null;
 function fmt(sec)
@@ -36,12 +37,14 @@ function stopTimer()
 document.addEventListener('DOMContentLoaded',()=>{
     const btnFind=document.getElementById('btn-find');
     const btnCancel=document.getElementById('btn-cancel');
-    btnFind.addEventListener('click',()=>{
+    btnFind.addEventListener('click',async()=>{
         btnFind.classList.add('is-finding');
         btnCancel.classList.add('is-finding');
         startTimer();
-        findGame({db,auth});
-
+        const matchId=await findGame({db,auth});
+        if(matchId){
+            await goToRoom(matchId);
+        }
     })
     btnCancel.addEventListener('click',()=>{
         btnFind.classList.remove('is-finding');
