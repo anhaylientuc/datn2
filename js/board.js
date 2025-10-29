@@ -73,6 +73,7 @@ async function fillPieces(matchId, match, snap) {
 
             const { k, v } = item;
             const curPiece = PIECES.find(item => item.id == v);
+            console.log(curPiece);
             if (curPiece) {
                 const { pos, img, id, x, y } = curPiece;
                 squares.forEach((cur) => {
