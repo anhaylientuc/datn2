@@ -176,7 +176,7 @@ async function ensureDelegationBound(matchId) {
 
         console.log('TO',to);
 
-        let result = await handleMove(pieceEl, from, to);
+        let result = handleMove(pieceEl, from, to);
         if (!result) {
             //trả quân về chỗ cũ trong DOM
             pieceEl.style.left = '0px';
