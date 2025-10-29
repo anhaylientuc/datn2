@@ -43,7 +43,9 @@ document.addEventListener('DOMContentLoaded',()=>{
         startTimer();
         const matchId=await findGame({db,auth});
         if(matchId){
-            await goToRoom(matchId);
+            const url=new URL('room.html',window.location.origin);
+            url.searchParams.set('room',String(matchId));
+            window.location.href=url.href;
         }
     })
     btnCancel.addEventListener('click',()=>{
