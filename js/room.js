@@ -38,11 +38,5 @@ function changeSide() {
 document.addEventListener("DOMContentLoaded",async ()=>{
     const params=new URLSearchParams(location.search);
     const matchId=params.get('room');
-    if(!matchId){
-        alert('Missing room');
-        location.replace('index.html');
-    }
-    else{
-        await goToRoom(matchId);
-    }
+    await goToRoom(matchId);
 })
