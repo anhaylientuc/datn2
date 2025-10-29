@@ -1,31 +1,27 @@
-:root {
+:root{
     --bg: #0f1115;
     --fg: #e6eaf2;
     --muted: #9aa3b2;
     --card: #151a23;
-    --border: #263143;
+    --border:  #263143;
     --hover: #1b2332;
-    --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+    --shadow:  0 10px 30px rgba(0,0,0,.35);
+    
     --accent: #2f81f7;
     --accent-2: #0ea5e9;
     --danger: #ef4444;
-    --success: #22c55e;
+    --success:#22c55e;
+
     --radius: 16px;
     --radius-sm: 10px;
     --gap: 16px;
 }
 
-* {
-    box-sizing: border-box
-}
+*{box-sizing: border-box;}
+html,body{height: 100%;}
 
-html,
-body {
-    height: 100%
-}
-
-body {
-    margin: 0;
+body{
+    margin:0;
     color: var(--fg);
     background: radial-gradient(1200px 800px at 12% -10%, #1a2130 0%, #0f1115 60%) fixed;
     font: 400 16px/1.55 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
@@ -33,121 +29,61 @@ body {
     grid-template-rows: auto 1fr;
 }
 
-.muted {
-    color: var(--muted)
-}
 
-.card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow)
-}
+.muted{color: var(--muted);}
+.card{ background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+.btn{ appearance: none; border: 0; border-radius: 12px; padding: 10px 14px; background: var(--accent); color: #fff; font-weight: 600; cursor: pointer; }
+.btn.ghost{background:  transparent; color: var(--fg); border: 1px solid var(--border);}
+.btn.danger{background: var(--danger);}
+.toolbar .btn{padding: 8px 12px;}
 
-.btn {
-    appearance: none;
-    border: 0;
-    border-radius: 12px;
-    padding: 10px 14px;
-    background: var(--accent);
-    color: #fff;
-    font-weight: 600;
-    cursor: pointer
-}
-
-.btn:hover {
-    background: var(--accent-2)
-}
-
-.btn.ghost {
-    background: transparent;
-    color: var(--fg);
-    border: 1px solid var(--border)
-}
-
-.btn.danger {
-    background: var(--danger)
-}
-
-.toolbar .btn {
-    padding: 8px 12px
-}
-
-/* Header */
-.header {
+/* ===== Header ===== */
+.header{
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 10px 12px;
     gap: 8px;
-    border-bottom: 1px solid var(--border)
+    border-bottom: 1px solid var(--border);
 }
 
-.room-code {
-    font-weight: 700;
-    letter-spacing: .4px;
-    font-size: 15px
-}
-
-.timer {
+.room-code{font-weight: 700; letter-spacing: .4px; font-size: 15px;}
+.timer{
     display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 6px 10px;
-    background: #111624;
+    background:  #111624;
     border: 1px solid var(--border);
     border-radius: 999px;
-    font-variant-numeric: tabular-nums
+    font-variant: tabular-nums;
 }
-
-.ic {
-    width: 24px;
-    height: 24px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px dashed #4f5d74;
-    border-radius: 8px;
-    background: #121826;
-    flex: 0 0 24px
+.ic{
+  width: 32px; height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px dashed #4f5d74;
+  border-radius: 10px;
+  background: #121826;
+  flex: 0 0 32px;
 }
-
-.ic img {
-    width: 14px;
-    height: 14px;
-    display: block;
-    object-fit: contain
-}
-
-/* Layout */
-.wrap {
+.ic img{ width: 18px; height: 18px; display: block; object-fit: contain; }
+/* ===== Layout (mobile: 1 cột) ===== */
+.wrap{
     padding: 12px;
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--gap)
+    gap:var(--gap);
 }
-
-.column-board,
-.column-side {
-    display: grid;
-    gap: var(--gap);
-    align-content: start
-}
-
-/* Players */
-.players {
-    padding: 8px
-}
-
-.player {
+/* ===== Players ===== */
+.players{padding: 8px;}
+.player{
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
     gap: 10px;
-    padding: 8px
+    padding: 8px;
 }
-
-.avatar {
+.avatar{
     width: 34px;
     height: 34px;
     border-radius: 50%;
@@ -155,174 +91,128 @@ body {
     border: 1px solid var(--border);
     display: grid;
     place-items: center;
-    font-weight: 700
-}
-
-.name {
     font-weight: 700;
-    font-size: 15px
 }
-
-.elo {
-    font-size: 13px;
-    color: var(--muted)
-}
-
-.clock {
+.name{font-weight: 700; font-size: 15px;}
+.elo{font-size: 13px; color: var(--muted);}
+.clock{
     padding: 6px 10px;
     border-radius: 8px;
     border: 1px solid var(--border);
     background: #111624;
-    font-variant-numeric: tabular-nums
+    font-variant-numeric: tabular-nums;
 }
-
-/* Board */
-.board-wrap {
-    padding: 10px
-}
-
+/* ===== Board ===== */
+.board-wrap{padding: 10px;}
 #board {
-    display: flex;
-    flex-wrap: wrap;
-    width: min(92vmin, 560px);
-    height: min(92vmin, 560px);
-    margin: 0 auto;
-    list-style: none;
-    touch-action: none;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-touch-callout: none;
-    -webkit-tap-highlight-color: transparent;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    background: #0b1220;
+  display: flex;
+  flex-wrap: wrap;
+  width: min(90vmin, 550px);
+  height: min(90vmin, 550px);
+  list-style: none;
+  /* chặn cuộn & chọn/callout */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.container {
+  width: auto;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  min-height: 100dvh;
+  width: 100%;
 }
 
 .square {
-    flex: 0 0 calc(100%/8);
-    aspect-ratio: 1/1;
-    position: relative;
-    display: block
+  flex: 0 0 calc(100%/8);
+  aspect-ratio: 1/1;
+  /* luôn là ô vuông */
+  position: relative;
+  /* cho .piece bám theo */
+  display: block;
 }
 
 .piece {
-    width: 90%;
-    height: 90%;
-    position: absolute;
-    top: 5%;
-    left: 5%;
-    touch-action: none;
-    user-select: none;
-    -webkit-user-select: none
+  /* bỏ dấu nháy! */
+  width: 90%;
+  height: 90%;
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  /* chặn gesture mặc định khi kéo */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .piece img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    pointer-events: none;
-    user-select: none;
-    -webkit-user-drag: none
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  /* chạm vào vẫn bắt .piece */
+  -webkit-user-drag: none;
+  /* tắt kéo ảnh mặc định */
 }
-
-/* Board colors */
-#board .square:nth-child(odd) {
-    background: #EEEED2
-}
-
-#board .square:nth-child(even) {
-    background: #769656
-}
-
-.coords {
+.coords{
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 8px;
-    padding: 8px 4px
+    padding: 8px 4px;
 }
+.toolbar{display: flex; gap: 8px;}
 
-.toolbar {
-    display: flex;
-    gap: 8px
-}
+/* ===== Moves & Chat ===== */
+.panel{padding: 10px;}
+.moves{max-height: 220px; overflow: auto;}
+.moves ol{margin: 0; padding-left: 22px;}
+.moves li{padding:4px 0; border-bottom: 1px dashed #1f2a3d;}
 
-/* Moves & Chat */
-.panel {
-    padding: 10px
-}
-
-.moves {
-    max-height: 220px;
-    overflow: auto
-}
-
-.moves ol {
-    margin: 0;
-    padding-left: 22px
-}
-
-.moves li {
-    padding: 4px 0;
-    border-bottom: 1px dashed #1f2a3d
-}
-
-.chat {
+.chat{
     display: grid;
     grid-template-rows: 1fr auto;
-    height: 320px
+    height: 320px;
 }
-
-.chat-log {
+.chat-log{
     overflow: auto;
     padding: 6px;
     display: grid;
-    gap: 8px
+    gap: 8px;
 }
-
-.msg {
+.msg{
     background: #111624;
     border: 1px solid var(--border);
     padding: 8px 10px;
-    border-radius: 10px
+    border-radius: 10px;
 }
-
-.chat-input {
-    display: flex;
-    gap: 8px
-}
-
-.chat-input input {
+.chat-input{display: flex; gap: 8px;}
+.chat-input input{
     flex: 1;
     background: #0c1424;
     color: var(--fg);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 10px 12px
+    padding: 10px 12px;
 }
-
-.actions {
+.actions{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px
+    gap: 8px;
 }
-
-/* ≥ 860px: 2 cột */
+/* ====== ≥ 860px: 2 cột ====== */
 @media (min-width:860px) {
-    .wrap {
-        grid-template-columns: 1fr 340px
-    }
-
-    #board {
-        width: min(82vmin, 720px);
-        height: min(82vmin, 720px)
-    }
+    .wrap{grid-template-columns: 1fr 340px;}
+    #board{max-width: min(82vmin,720px);}
 }
 
-/* ≥ 1080px: side rộng hơn */
+/* ====== ≥ 1080px: side rộng hơn ====== */
 @media (min-width:1080px) {
-    .wrap {
-        grid-template-columns: 1fr 360px
-    }
+    .wrap{grid-template-columns: 1fr 360px;}
+    
 }

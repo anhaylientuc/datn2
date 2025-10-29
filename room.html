@@ -1,83 +1,101 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Game Room</title>
-  <link rel="stylesheet" href="css/room.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/room.css" />
 </head>
+
 <body>
-  <header class="header">
-    <div class="left">
-      <span class="room-code">Room: <strong id="room-id">#-----</strong></span>
-    </div>
-    <div class="right">
-      <div class="timer" aria-live="polite">
-        <span class="ic"><img src="/images/clock.png" alt=""></span>
-        <span id="room-timer">00:00</span>
-      </div>
-    </div>
-  </header>
+    <header class="header">
+        <div class="left">
+            <span class="room-code">Room: <strong id="room-id">#123456</strong></span>
 
-  <main class="wrap">
-    <!-- BOARD COLUMN -->
-    <section class="column-board">
-      <div class="card panel players">
-        <div class="player" id="player-top">
-          <div class="avatar">B</div>
-          <div>
-            <div class="name">Black • <span class="muted" id="p2-name">Opponent</span></div>
-            <div class="elo">ELO <span id="p2-elo">1200</span></div>
-          </div>
-          <div class="clock" id="p2-clock" aria-live="polite">10:00</div>
         </div>
-        <div class="player" id="player-bottom">
-          <div class="avatar">W</div>
-          <div>
-            <div class="name">White • <span class="muted" id="p1-name">You</span></div>
-            <div class="elo">ELO <span id="p1-elo">1200</span></div>
-          </div>
-          <div class="clock" id="p1-clock" aria-live="polite">10:00</div>
+        <div class="right">
+            <div class="timer" aria-live="polite">
+                <span>
+                    <img class="ic" src="src/icons/clock.png" />
+                </span>
+                <span id="room-timer">
+                    00:00
+                </span>
+            </div>
         </div>
-      </div>
+    </header>
 
-      <div class="board-wrap card">
-        <ul id="board" aria-label="Chess board"></ul>
-        <div class="coords">
-          <span class="muted">Turn: <strong id="turn">white</strong></span>
-          <div class="toolbar">
-            <button class="btn ghost" id="btn-undo">↶ Undo</button>
-            <button class="btn ghost" id="btn-redo">↷ Redo</button>
-          </div>
-        </div>
-      </div>
+    <main class="wrap">
+        <section class="column-board">
+            <!-- Players -->
+            <div class="card panel players">
+                <div class="player" id="player-top">
+                    <div class="avatar" aria-hidden="true">B</div>
+                    <div>
+                        <div class="name">Black: <span class="muted" id="p2-name">Opponent</span></div>
+                        <div class="elo">ElO: <span id="p2-elo">1200</span></div>
+                    </div>
+                    <div class="clock" id="p2-clock" aria-live="polite">10:00</div>
+                </div>
+                <div class="player" id="player-bottom">
+                    <div class="avatar" aria-hidden="true">W</div>
+                    <div>
+                        <div class="name">White: <span class="muted" id="p1-name">You</span></div>
+                        <div class="elo">ElO: <span id="p2-elo">1200</span></div>
+                    </div>
+                    <div class="clock" id="p1-clock" aria-live="polite">10:00</div>
+                </div>
+            </div>
+            <!-- Board -->
+            <div class="board-wrap card">
+                <div class="board" id="board" role="grid" aria-label="Chess board">
 
-      <div class="actions">
-        <button class="btn" id="btn-offer-draw">Offer Draw</button>
-        <button class="btn danger" id="btn-resign">Resign</button>
-      </div>
-    </section>
+                </div>
+                <div class="coords">
+                    <span class="muted">Turn: <strong id="turn">white</strong></span>
+                </div>
+                <div class="toolbar">
+                    <button class="btn ghost" id="btn-undo">Undo</button>
+                    <button class="btn ghost" id="btn-redo">Redo</button>
+                </div>
+            </div>
+            <!-- Actions -->
+            <div class="actions">
+                <button class="btn" id="btn-offer-draw">Offer Draw</button>
+                <button class="btn danger" id="btn-resign">Resign</button>
+            </div>
+        </section>
 
-    <!-- SIDE COLUMN -->
-    <aside class="column-side">
-      <div class="card panel">
-        <div class="muted" style="margin-bottom:8px">Move List</div>
-        <div class="moves" id="moves">
-          <ol></ol>
-        </div>
-      </div>
+        <aside class="column-side">
+            <div class="card-panel">
+                <div class="muted" style="margin-bottom: 8px;">Move List</div>
+                <div class="moves" id="moves">
+                    <ol>
+                        <li>1. e4 e5</li>
+                        <li>2. Nf3 Nc6</li>
+                        <li>3. Bb5 a6</li>
+                    </ol>
+                </div>
+            </div>
 
-      <div class="card panel chat">
-        <div class="muted" style="margin-bottom:8px">Chat</div>
-        <div class="chat-log" id="chat-log"></div>
-        <form class="chat-input" onsubmit="return false;">
-          <input id="chat-text" placeholder="Type a message…" />
-          <button class="btn" id="chat-send">Send</button>
-        </form>
-      </div>
-    </aside>
-  </main>
+            <div class="card panel chat">
+                <div class="muted" style="margin-bottom:8px">Chat</div>
+                <div class="chat-log" id="chat-log">
+                    <div class="msg">Welcome! Good luck & have fun.</div>
+                </div>
+                <form class="chat-input" onsubmit="return false;">
+                    <input id="chat-text" placeholder="Type a message..."/>
+                    <button class="btn" id="chat-send">Send</button>
 
-  <script type="module" src="js/room.js"></script>
+                </form>
+            </div>
+        </aside>
+
+    </main>
+
+
+    <script type="module" src="js/room.js"></script>
+
 </body>
+
 </html>
