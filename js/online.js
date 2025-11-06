@@ -1,6 +1,5 @@
 import { db,auth } from "./firebase";
 import { cancelGame, findGame } from "./matching";
-import { goToRoom } from "./room";
 let sec=0;
 let timerId=null;
 function fmt(sec)
@@ -41,18 +40,13 @@ document.addEventListener('DOMContentLoaded',()=>{
         btnFind.classList.add('is-finding');
         btnCancel.classList.add('is-finding');
         startTimer();
-        const matchId=await findGame({db,auth});
-        if(matchId){
-            const url=new URL('room.html',window.location.origin);
-            url.searchParams.set('room',String(matchId));
-            window.location.href=url.href;
-        }
+        await findGame({db,auth});
     })
     btnCancel.addEventListener('click',()=>{
         btnFind.classList.remove('is-finding');
         btnCancel.classList.remove('is-finding');
         stopTimer();
-        cancelGame();
+        cancelGame({db,auth});
     })
 
 

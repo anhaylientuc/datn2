@@ -1,128 +1,69 @@
 
 import { runTransaction, ref, onValue, get, update } from "firebase/database";
-import { PIECES, BOARD } from "./constants/piece";
+import { PIECES } from "./constants/piece";
 import { auth, db } from "./firebase";
 import { handleMove } from "./move";
-const boardEl = document.getElementById('board');
+import { boardEl } from "./app";
 let activePiece = null;
 let startLeft = 0, startTop = 0;
 let startClientX = 0, startClientY = 0;
 let fromPos = null;
-let curSide = '';
-let currentTurn = null;
-export let globalBoard=null;
-function flipBoardDOM() {
-    const nodes = Array.from(boardEl.children);
-    for(let i=7;i>=0;i--){
-        for(let j=0;j<8;j++){
-            boardEl.appendChild(nodes[i*8+j]);
-        }
-    }
-}
-export async function renderBoard(snap) {
-    const match = snap.val();
-    const matchId = snap.key;
-    const { a, b } = match;
-    const uid = auth.currentUser.uid;
-
-    const side = (uid == a ? 'white' : 'black');
-
-    curSide = side;
-    BOARD.flat().forEach((cur, index) => {
-        const li = document.createElement('li');
-        li.className = 'square';
-        li.dataset.value = cur;
-        boardEl.appendChild(li);
-    })
-    fillColorBoard();
-    if (side == 'black')
-        flipBoardDOM();
-    await fillPieces(matchId, match, snap);
-}
-
-function fillColorBoard() {
-    const container = document.querySelectorAll('#board li')
-    container.forEach((item, index) => {
-        item.style.backgroundColor = (Math.floor(index / 8) + index) % 2 == 0 ? '#EEEED2' : '#769656';
-    })
-
-}
-async function fillPieces(matchId, match, snap) {
+let turn = '';
+let side = '';
+export let globalBoard = null;
+export async function fillPieces(matchId) {
     const boardRef = ref(db, `matches/${matchId}/board`);
     const squares = document.querySelectorAll('#board li');
-
-    const stopBoard = onValue(boardRef, snap => {
+    const uid = auth?.currentUser?.uid;
+    const sideRef = ref(db, `users/${uid}/side`);
+    side = (await get(sideRef)).val();
+    const stopBoard = onValue(boardRef, async snap => {
         if (!snap.exists())
             return;
-
+        const turnRef = ref(db, `matches/${matchId}/turn`);
+        turn = (await get(turnRef)).val();
+        console.log(turn);
         const board = snap.val();
-        globalBoard=board;
+        globalBoard = board;
         const pieces = [];
         for (const [k, v] of Object.entries(board)) {
             pieces.push({ k, v });
         }
         const piecesMap = new Map(Object.entries(board));
         squares.forEach(cur => {
+            cur.innerHTML = '';
             const pos = cur.dataset.value;
-            if (piecesMap.get(pos) == 0) {
-                cur.innerHTML = '';
+            if (piecesMap.get(pos)) {
+                const idPiece = piecesMap.get(pos);
+                const p = document.createElement('div');
+                p.className = 'piece';
+                p.dataset.value = idPiece;
+
+                const imgPiece = document.createElement('img');
+                imgPiece.src = PIECES[idPiece - 1].img;
+
+                PIECES[idPiece - 1].status = (PIECES[idPiece - 1].side == turn ? 1 : 0);
+
+                p.appendChild(imgPiece);
+                cur.appendChild(p);
             }
         })
-
-        pieces.forEach(item => {
-
-            const { k, v } = item;
-            const curPiece = PIECES.find(item => item.id == v);
-            console.log(curPiece);
-            if (curPiece) {
-                const { pos, img, id, x, y } = curPiece;
-                squares.forEach((cur) => {
-                    if (cur.dataset.value !== k) {
-                        return;
-                    }
-                    if (cur.querySelector('.piece'))
-                        return;
-                    const div = document.createElement('div');
-                    div.className = 'piece';
-                    div.dataset.value = id;
-
-                    const _img = document.createElement('img');
-                    _img.src = img;
-
-                    div.appendChild(_img)
-                    cur.appendChild(div)
-                })
-            }
-
-        })
+        await ensureDelegationBound(matchId);
     })
-    await ensureDelegationBound(matchId);
-
-
-
 }
 let delegationBound = false;
 async function ensureDelegationBound(matchId) {
     if (delegationBound)
         return;
     delegationBound = true;
-    const turnRef = ref(db, `matches/${matchId}/turn`);
-    onValue(turnRef, (s) => {
-        if (s.exists()) currentTurn = s.val();   // 'white' | 'black'
-    });
     boardEl.addEventListener('pointerdown', e => {
-        if (currentTurn !== curSide) {
-            // feedback nhỏ cho UX
-            // ví dụ: rung nhẹ quân hoặc log
-            // piece.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(6px)' }, { transform: 'translateX(0)' }], { duration: 120 });
-            console.log('[TURN] Not your turn:', { currentTurn, curSide });
-            return;
-        }
         const piece = e.target.closest('.piece');
-        if (!piece || !boardEl.contains(piece)) {
+        const idPiece = piece.dataset.value;
+
+        if (!piece || !boardEl.contains(piece) || PIECES[idPiece - 1].status == 0 || side != turn) {
+            console.log(side, turn);
             return;
         }
-
         activePiece = piece;
 
 
@@ -163,7 +104,6 @@ async function ensureDelegationBound(matchId) {
         pieceEl.style.cursor = 'grab';
 
         if (!dropSquare || !fromPos) {
-            console.log('clm');
             pieceEl.style.left = '0px';
             pieceEl.style.top = '0px';
             return;
@@ -175,7 +115,6 @@ async function ensureDelegationBound(matchId) {
 
         let pendingUpdate = null;
 
-        console.log('TO',to);
 
         let result = handleMove(pieceEl, from, to);
         if (!result) {
@@ -185,23 +124,20 @@ async function ensureDelegationBound(matchId) {
             return;
         }
         for (const [k, v] of Object.entries(globalBoard)) {
-            if(k==from){
-                globalBoard[k]=0;
+            if (k == from) {
+                globalBoard[k] = 0;
             }
-            if(k==to)
-                globalBoard[k]=pieceEl.dataset.value;
+            if (k == to)
+                globalBoard[k] = pieceEl.dataset.value;
         }
+        const nextTurn = turn == 'white' ? 'black' : 'white';
         pendingUpdate = {
             board: globalBoard,
             lastMove: { from, to, ts: Date.now() },
-            turn: curSide == 'white' ? 'black' : 'white'
+            turn: nextTurn
 
         };
 
-        // dropSquare.innerHTML = '';
-        // dropSquare.appendChild(pieceEl);
-        // pieceEl.style.left = '0px';
-        // pieceEl.style.top = '0px';
 
 
 
@@ -211,10 +147,8 @@ async function ensureDelegationBound(matchId) {
                 await update(matchRef, pendingUpdate);
             } catch (err) {
                 console.error('update(board) failed:', err);
-                // optional: rollback UI hoặc báo lỗi
             }
         }
-        console.log('POINT UP');
     })
 
 

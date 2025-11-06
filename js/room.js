@@ -1,42 +1,28 @@
 import { get, update } from "firebase/database";
-import { renderBoard } from "./board";
 import { auth, db, ref } from "./firebase";
-import { BOARD, PIECES, PIECES_AT } from "./constants/piece";
-export async function goToRoom(id) {
-    const matchRef = ref(db, `matches/${id}`);
-    const snap = await get(matchRef);
-    renderBoard(snap);
-}
-function changeSide() {
-    for (let i = 0; i < 8; i++) {
-        let a = PIECES_AT[0][i];
-        let b = PIECES_AT[7][i];
-        [a, b] = [b, a];
+import { boardEl } from "./app";
+import { fillPieces } from "./board";
+let params = null;
+let matchId = null;
+let side = '';
+async function flipBoardDOM() {
 
-        let c = PIECES_AT[1][i];
-        let d = PIECES_AT[6][i];
-        [c, d] = [d, c];
-    }
-    PIECES.forEach(item => {
-        const { x } = item;
-        switch (x) {
-            case 0:
-                item.x = 7;
-                break;
-            case 1:
-                item.x = 6;
-                break;
-            case 7:
-                item.x = 0;
-                break;
-            case 6:
-                item.x = 1;
-                break;
+    const nodes = Array.from(boardEl.children);
+    for (let i = 7; i >= 0; i--) {
+        for (let j = 0; j < 8; j++) {
+            boardEl.appendChild(nodes[i * 8 + j]);
         }
-    })
+    }
 }
-document.addEventListener("DOMContentLoaded",async ()=>{
-    const params=new URLSearchParams(location.search);
-    const matchId=params.get('room');
-    await goToRoom(matchId);
+document.addEventListener('DOMContentLoaded', async () => {
+    params = new URLSearchParams(window.location.search);
+    matchId = params.get('room');
+    const matchRef = ref(db, `matches/${matchId}`);
+    const match = (await get(matchRef)).val();
+    const uid = auth?.currentUser?.uid;
+    const sideRef = ref(db, `users/${uid}/side`);
+    side = (await get(sideRef)).val();
+    if(side=='black')
+        flipBoardDOM();
+    await fillPieces(matchId);
 })
