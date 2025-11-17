@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/playAI.css" />
+</head>
+
+<body>
+    <div class="board-wrap card">
+        <div class="board-layout">
+            <!-- CỘT TRÁI: Bàn cờ + Turn + Undo/Redo -->
+            <div class="board-main">
+                <div class="board" id="board" role="grid" aria-label="Chess board"></div>
+
+                <div class="coords">
+                    <span class="muted">Turn: <strong id="turn">white</strong></span>
+                </div>
+
+                <div class="toolbar">
+                    <button class="btn ghost" id="btn-undo">Undo</button>
+                    <button class="btn ghost" id="btn-redo">Redo</button>
+                </div>
+            </div>
+
+            <!-- CỘT PHẢI: Moves -->
+            <aside class="moves-panel" aria-label="Move history">
+                <div class="moves-wrap">
+                    <div class="moves-header">
+                        <span class="moves-title">Moves</span>
+                        <button class="btn ghost btn-sm" id="btn-clear-moves">Clear</button>
+                    </div>
+                    <div class="moves-list" id="moves-list" role="log" aria-label="Move history list">
+                        <!-- JS append move-pill ở đây -->
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div class="toast toast-difficulty" id="toast-difficulty" role="dialog" aria-live="polite">
+        <div style="flex:1 1 auto;">
+            <div class="toast__title">Choose difficulty</div>
+            <p class="toast__subtitle">Higher level = stronger & slower AI. You can change it later.</p>
+            <div class="toast__options">
+                <button class="chip is-active" data-level="easy">Easy</button>
+                <button class="chip" data-level="normal">Medium</button>
+                <button class="chip" data-level="hard">Hard</button>
+            </div>
+
+            <!-- footer mới: nút xác nhận -->
+            <div class="toast__footer">
+                <button class="btn primary" id="btn-confirm-diff">Start game</button>
+            </div>
+        </div>
+
+        <button class="toast__close" id="btn-close-diff" aria-label="Close">×</button>
+
+
+    </div>
+   
+    <script type="module" src="js/playAI.js"></script>
+</body>
+
+</html>

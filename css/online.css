@@ -185,15 +185,6 @@ body{
 #status-card{ display: none; }
 #status-card.show{ display: block; }
 
-/* ============ Guest vs Auth visibility ============ */
-/* Mặc định: coi như guest; khi đăng nhập, JS thêm class .is-auth lên <body> */
-/* Mặc định: khách */
-.when-auth { display: none; }
-.when-guest { display: block; }
-
-/* Khi đã đăng nhập (body có .is-auth) */
-body.is-auth .when-auth { display: block; }
-body.is-auth .when-guest { display: none; }
 
 /* ============ MATCH FOUND modal ============ */
 #opponent-overplay{

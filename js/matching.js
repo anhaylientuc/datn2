@@ -5,6 +5,7 @@ import {
     serverTimestamp,
 } from "firebase/database";
 import { BOARD, PIECES_AT } from "./constants/piece";
+import { printBoard } from "./app";
 let offMatch = null;
 
 export async function findGame({ db, auth }) {
@@ -50,7 +51,8 @@ export async function findGame({ db, auth }) {
         const { a, b } = matchSnap.val();
         const updates = {
             [`users/${a}/side`]: 'white',
-            [`users/${b}/side`]: 'black'
+            [`users/${b}/side`]: 'black',
+
         }
         await update(ref(db), updates);
         const sideA = (await get(ref(db, `users/${a}`))).val();
@@ -97,11 +99,13 @@ export async function findGame({ db, auth }) {
         const bit = Math.floor(Math.random() * 2);
 
         let board = {};
-        for (let i = 0; i < 8; i++) {
+        const cols='ABCDEFGH';
+        for (let i = 0; i <8; i++) {
             for (let j = 0; j < 8; j++) {
-                board[BOARD[i][j]] = PIECES_AT[i][j];
+                board[cols[j]+(8-i)] = PIECES_AT[i][j];
             }
         }
+        printBoard(board);
         const updates = {
             [`users/${uid}/matchId`]: matchId,
             [`users/${oppUid}/matchId`]: matchId,
@@ -113,7 +117,10 @@ export async function findGame({ db, auth }) {
                 turn: 'white',
                 lastMove: { from: '', to: '' },
                 a: bit?uid:oppUid,
-                b: bit?oppUid:uid
+                b: bit?oppUid:uid,
+                winner:'none',
+                timeW:600,
+                timeB:600,
             }
         };
 

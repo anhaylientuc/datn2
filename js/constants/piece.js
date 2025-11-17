@@ -48,12 +48,26 @@ export const BOARD = [
   ['A8', 'B8', 'C8', 'D8', 'E8', 'F8', 'G8', 'H8']
 ];
 export const PIECES_AT=[
-  [1,2,3,4,5,6,7,8],
-  [9,10,11,12,13,14,15,16],
-  [0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0],
-  [25,26,27,28,29,30,31,32],
-  [17,18,19,20,21,22,23,24],
+  ['r','n','b','q','k','b','n','r'],
+  ['p','p','p','p','p','p','p','p'],
+  ['.','.','.','.','.','.','.','.'],
+  ['.','.','.','.','.','.','.','.'],
+  ['.','.','.','.','.','.','.','.'],
+  ['.','.','.','.','.','.','.','.'],
+  ['P','P','P','P','P','P','P','P'],
+  ['R','N','B','Q','K','B','N','R'],
 ]
+export const pieceMap=new Map();
+pieceMap.set('P','/images/wP.png');
+pieceMap.set('R','/images/wR.png');
+pieceMap.set('N','/images/wN.png')
+pieceMap.set('B','/images/wB.png');
+pieceMap.set('K','/images/wK.png');
+pieceMap.set('Q','/images/wQ.png')
+
+pieceMap.set('p','/images/bP.png');
+pieceMap.set('r','/images/bR.png');
+pieceMap.set('n','/images/bN.png')
+pieceMap.set('b','/images/bB.png');
+pieceMap.set('k','/images/bK.png');
+pieceMap.set('q','/images/bQ.png');

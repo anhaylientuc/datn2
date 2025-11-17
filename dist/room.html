@@ -4,8 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script type="module" crossorigin src="./assets/room-DM5XXKpW.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/room-CmEHTLlK.css">
+  <script type="module" crossorigin src="./assets/room-Cj2CUYoF.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/piece-DEAYhcV3.js">
+  <link rel="modulepreload" crossorigin href="./assets/app-2Mqvq-DZ.js">
+  <link rel="stylesheet" crossorigin href="./assets/room-uCvo66PV.css">
 </head>
 
 <body>
@@ -27,6 +29,18 @@
     </header>
 
     <main class="wrap">
+        <div class="overlay-result" id="overlay-result" role="dialog" aria-live="polite" aria-modal="true">
+            <div class="overlay-result__card">
+                <div class="overlay-result__title" id="result-title">You win!</div>
+                <p class="overlay-result__subtitle" id="result-subtitle">
+                    Checkmate. Nice game!
+                </p>
+                <div class="overlay-result__footer">
+                    <button class="btn ghost" id="btn-close-result">Close</button>
+                    <button class="btn primary" id="btn-newgame-result">New game</button>
+                </div>
+            </div>
+        </div>
         <section class="column-board">
             <!-- Players -->
             <div class="card panel players">
@@ -34,7 +48,7 @@
                     <div class="avatar" aria-hidden="true">B</div>
                     <div>
                         <div class="name">Black: <span class="muted" id="p2-name">Opponent</span></div>
-                        <div class="elo">ElO: <span id="p2-elo">1200</span></div>
+                        <!-- <div class="elo">ElO: <span id="p2-elo">1200</span></div> -->
                     </div>
                     <div class="clock" id="p2-clock" aria-live="polite">10:00</div>
                 </div>
@@ -42,7 +56,7 @@
                     <div class="avatar" aria-hidden="true">W</div>
                     <div>
                         <div class="name">White: <span class="muted" id="p1-name">You</span></div>
-                        <div class="elo">ElO: <span id="p2-elo">1200</span></div>
+                        <!-- <div class="elo">ElO: <span id="p2-elo">1200</span></div> -->
                     </div>
                     <div class="clock" id="p1-clock" aria-live="polite">10:00</div>
                 </div>
@@ -52,49 +66,60 @@
                 <div class="board" id="board" role="grid" aria-label="Chess board">
 
                 </div>
-                <div class="coords">
+                <!-- <div class="coords">
                     <span class="muted">Turn: <strong id="turn">white</strong></span>
-                </div>
-                <div class="toolbar">
-                    <button class="btn ghost" id="btn-undo">Undo</button>
-                    <button class="btn ghost" id="btn-redo">Redo</button>
+                </div> -->
+                <div class="board-footer">
+                    <!-- <div class="coords">
+                        <span class="muted">
+                            Turn: <strong id="turn">white</strong>
+                        </span>
+                    </div> -->
+                    <div class="toolbar">
+                        <button class="btn ghost" id="btn-undo" aria-label="Undo move">
+                            ⟲ <span>Undo</span>
+                        </button>
+                        <button class="btn ghost" id="btn-redo" aria-label="Redo move">
+                            <span>Redo</span> ⟳
+                        </button>
+                        <button class="btn ghost danger" id="btn-toggle-bot" aria-label="Toggle bot">
+                            Bot: ON
+                        </button>
+                    </div>
                 </div>
             </div>
             <!-- Actions -->
             <div class="actions">
-                <button class="btn" id="btn-offer-draw">Offer Draw</button>
-                <button class="btn danger" id="btn-resign">Resign</button>
+                <div class="actions-left">
+                    <button class="btn ghost" id="btn-home">Home</button>
+                    <button class="btn ghost" id="btn-newgame">New game</button>
+                </div>
+
+                <div class="actions-right">
+                    <button class="btn" id="btn-offer-draw">Offer Draw</button>
+                    <button class="btn danger" id="btn-resign">Resign</button>
+                </div>
             </div>
+
         </section>
 
         <aside class="column-side">
             <div class="card-panel">
                 <div class="muted" style="margin-bottom: 8px;">Move List</div>
                 <div class="moves" id="moves">
-                    <ol>
-                        <li>1. e4 e5</li>
+                    <ul>
+                        <!-- <li>1. e4 e5</li>
                         <li>2. Nf3 Nc6</li>
-                        <li>3. Bb5 a6</li>
-                    </ol>
+                        <li>3. Bb5 a6</li> -->
+                    </ul>
                 </div>
             </div>
 
-            <div class="card panel chat">
-                <div class="muted" style="margin-bottom:8px">Chat</div>
-                <div class="chat-log" id="chat-log">
-                    <div class="msg">Welcome! Good luck & have fun.</div>
-                </div>
-                <form class="chat-input" onsubmit="return false;">
-                    <input id="chat-text" placeholder="Type a message..."/>
-                    <button class="btn" id="chat-send">Send</button>
-
-                </form>
-            </div>
         </aside>
 
     </main>
-
 
+
 
 </body>
 

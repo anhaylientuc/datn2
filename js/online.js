@@ -33,9 +33,11 @@ function stopTimer()
     const timeEl=document.getElementById('time');
     timeEl.textContent=fmt(sec);
 }
-document.addEventListener('DOMContentLoaded',()=>{
+document.addEventListener('DOMContentLoaded',async()=>{
     const btnFind=document.getElementById('btn-find');
     const btnCancel=document.getElementById('btn-cancel');
+    const user=JSON.parse(localStorage.getItem('user'));
+    const uid=user.uid;
     btnFind.addEventListener('click',async()=>{
         btnFind.classList.add('is-finding');
         btnCancel.classList.add('is-finding');
@@ -48,6 +50,6 @@ document.addEventListener('DOMContentLoaded',()=>{
         stopTimer();
         cancelGame({db,auth});
     })
-
+    
 
 })

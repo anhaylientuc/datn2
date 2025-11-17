@@ -68,3 +68,172 @@ body{
   text-decoration: none;
   color: inherit;
 }
+
+/* ============ Guest vs Auth visibility ============ */
+/* Mặc định: coi như guest; khi đăng nhập, JS thêm class .is-auth lên <body> */
+/* Mặc định: khách */
+.when-auth { display: none; }
+.when-guest { display: block; }
+
+/* Khi đã đăng nhập (body có .is-auth) */
+body.is-auth .when-auth { display: block; }
+body.is-auth .when-guest { display: none; }
+
+
+.card{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+.card .row{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.card__row{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ic{
+  width: 32px; height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px dashed #4f5d74;
+  border-radius: 10px;
+  background: #121826;
+  flex: 0 0 32px;
+}
+.ic img{ width: 18px; height: 18px; display: block; object-fit: contain; }
+
+.ic16{ width: 16px; height: 16px; vertical-align: -2px; margin-right: 8px; }
+
+/* ============ Text helpers ============ */
+.muted{ color: var(--muted); }
+.small{ font-size: 13px; }
+
+/* ============ Buttons ============ */
+.btn{
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: 600;
+  background: #1c2433;
+  color: var(--fg);
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px;
+  transition: background .15s, transform .05s, border-color .15s, box-shadow .15s;
+}
+.btn:hover{ background: var(--hover); }
+.btn:active{ transform: translateY(1px); }
+.btn:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(47,129,247,.35);
+}
+.ic img{ width: 18px; height: 18px; display: block; object-fit: contain; }
+
+.ic16{ width: 16px; height: 16px; vertical-align: -2px; margin-right: 8px; }
+#guest-card .row button{
+  background: #192235;
+  border: 1px solid #2b3a55;
+  color: var(--fg);
+}
+#guest-card .row button:hover{ background: #1f2a40; }
+#guest-card .row button{
+  appearance: none; -webkit-appearance: none; -moz-appearance: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 10px;
+
+  /* KÍCH THƯỚC TO */
+  min-height: 52px;               /* cao hơn */
+  padding: 14px 18px;             /* đệm lớn */
+  font-size: 16px;                /* chữ to hơn */
+  font-weight: 700;
+
+  /* BO TRÒN + NỀN */
+  border-radius: 14px;            /* bo tròn */
+  border: 1px solid transparent;
+  background: #192235;
+  color: var(--fg);
+
+  /* HIỆU ỨNG */
+  transition: background .15s, border-color .15s, transform .05s, box-shadow .15s, opacity .15s;
+  cursor: pointer;
+}
+#guest-card .row button:hover{
+  background: #1f2a40;
+  border-color: #2b3a55;
+}
+#guest-card .row button:active{ transform: translateY(1px); }
+#guest-card .row button:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(47,129,247,.28);
+}
+
+/* Icon chuẩn 18px và canh đẹp */
+#guest-card .row button .ic16{
+  width: 18px; height: 18px;
+  display: block; object-fit: contain;
+  margin-right: 4px;              /* khoảng cách nhỏ với text */
+}
+@media (max-width: 520px){
+  #guest-card .row{ grid-template-columns: 1fr; }
+  #guest-card .row button{ width: 100%; }
+}
+
+/* Tuỳ chọn: nút Google nền trắng, chữ tối (theo brand) */
+#btn-google{
+  background: #fff;
+  color: #1f2937;
+  border-color: #e5e7eb;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+}
+#btn-google:hover{
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+body.auth-pending .when-auth,
+body.auth-pending .when-guest {display: none;}
+/* --- vùng wallpaper toàn màn hình --- */
+.hero-wallpaper{
+  position: relative;
+  min-height: 100vh;          /* phủ full màn hình */
+  background-image: url("/src/images/wallpaper.jpg"); /* đổi đường dẫn ảnh của bạn */
+  background-size: min(70vw, 620px) auto;     /* phóng đầy */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #0f1115;           /* nền tối phủ phần trống */
+
+}
+
+/* lớp phủ mờ để tăng độ tương phản nội dung */
+.hero-overlay{
+  position: absolute; inset: 0;
+  background: radial-gradient(70% 70% at 50% 30%, rgba(0,0,0,.25), rgba(0,0,0,.55));
+}
+
+/* vùng chứa nội dung, canh giữa card */
+.hero-content{
+  position: relative;         /* nằm trên overlay */
+  min-height: inherit;
+  display: grid;
+  place-items: center;        /* canh giữa ngang + dọc */
+  padding: 24px;              /* chừa khoảng ở mobile */
+}
+
+/* card của bạn vẫn dùng style cũ; có thể thêm “kính mờ” nếu thích */
+#guest-card{
+  backdrop-filter: blur(4px);             /* kính mờ (tùy chọn) */
+  background: rgba(21,26,35,.85);         /* mờ nền cho dễ đọc */
+  border: 1px solid #263143;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  color: #e6eaf2;
+}

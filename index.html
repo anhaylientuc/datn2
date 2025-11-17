@@ -8,10 +8,10 @@
 </head>
 
 <body>
-  <div id="menu">
+  <div class="menu when-auth" id="menu">
     <ul>
       <li>
-        <a class="menu-link" href="">
+        <a class="menu-link" href="playAI.html">
           <span class="ic">
             <img src="src/icons/robot-face.png" />
           </span>
@@ -51,13 +51,36 @@
 
 
   </div>
+  <div class="hero-wallpaper when-guest">
+    <div class="hero-overlay"></div> <!-- lớp phủ làm tối ảnh để chữ nổi hơn -->
+    <div class="hero-content">
+      <div class="card" id="guest-card" role="region" aria-label="Sign in">
+        <p><strong>Sign in to play online</strong></p>
+        <p class="muted">You need to sign in to join matchmaking and play online.</p>
+        <div class="row">
+          <button id="btn-google">
+            <img class="ic16" src="src/icons/google.png" alt="" aria-hidden="true" />
+            Sign in with Google
+          </button>
+          <button id="btn-guest">
+            <img class="ic16" src="src/icons/person.png" alt="" aria-hidden="true" />
+            Play as Guest
+          </button>
+        </div>
+        <small class="muted">
+          Why sign in? Save your ELO and match history, prevent cheating, and ensure fair rankings.
+        </small>
+      </div>
+    </div>
+  </div>
 
 
   <!-- Các module để cuối body -->
-  <script type="module" src="js/firebase.js"></script>
+  <script type="module" src="js/auth.js"></script>
   <script type="module" src="js/app.js"></script>
   <script type="module" src="js/index.js"> </script>
-  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/firebase.js"></script>
+
 </body>
 
 </html>

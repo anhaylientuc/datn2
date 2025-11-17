@@ -30,6 +30,22 @@
   display: block;
 }
 
+.square[data-file='A']::before{
+  content: attr(data-rank);
+  left: 4px;
+  top: 2px;
+}
+.square[data-rank='1']::after{
+  content: attr(data-file);
+  right: 4px;
+  bottom: 2px;
+  
+}
+
+
+
+
+
 .piece {
   /* bỏ dấu nháy! */
   width: 90%;

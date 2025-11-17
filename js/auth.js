@@ -1,7 +1,8 @@
 document.body.classList.add('auth-pending');
 import { auth, db, provider } from "./firebase.js";
-import { ref, set, update,push, serverTimestamp } from "firebase/database";
+import { ref, set, update, push, serverTimestamp } from "firebase/database";
 import { getRedirectResult, signInAnonymously, signOut, onAuthStateChanged, signInWithRedirect, signInWithPopup } from "firebase/auth";
+export let user = null;
 async function logout() {
     try {
 
@@ -48,43 +49,59 @@ document.addEventListener('DOMContentLoaded', () => {
         finally {
         }
     })
-    onAuthStateChanged(auth, (user) => {
-        document.body.classList.remove('auth-pending');
-        if (user) {
-            document.body.classList.add('is-auth');
-            const displayName = user.displayName || user.email || 'You';
-            if (nameEl) nameEl.textContent = displayName;
-            if (avatarEl) avatarEl.src = user.photoURL || 'src/icons/user.png';
 
+    onAuthStateChanged(auth, (u) => {
+        document.body.classList.remove('auth-pending');
+        if (u) {
+            document.body.classList.add('is-auth');
+            const displayName = u.displayName || u.email || 'You';
+            if (nameEl) nameEl.textContent = displayName;
+            if (avatarEl) avatarEl.src = u.photoURL || 'src/icons/user.png';
+            user=u
+            console.log(user.uid)
 
         }
         else {
             document.body.classList.remove('is-auth');
         }
     })
+    // document.body.classList.remove('auth-pending');
+    // const user = JSON.parse(localStorage.getItem('user'));
+    // if (user) {
+    //     document.body.classList.add('is-auth');
+    //     const displayName = u.displayName || u.email || 'You';
+    //     if (nameEl) nameEl.textContent = displayName;
+    //     if (avatarEl) avatarEl.src = u.photoURL || 'src/icons/user.png';
+    //     user = u
+    //     console.log(user.uid)
+    // }
+    // else
+    //     document.body.classList.remove('is-auth');
 
     btnGuest?.addEventListener('click', async () => {
         try {
-            const cred=await signInAnonymously(auth);
-            const user=cred.user;
-            const uid=user.uid;
+            console.log('ok');
+            const cred = await signInAnonymously(auth);
+            const user = cred.user;
+            localStorage.setItem('user', JSON.stringify(user));
+            const uid = user.uid;
             if (nameEl) nameEl.textContent = `Guest-${uid.slice(-4)}`;
             if (avatarEl) avatarEl.src = user.photoURL || 'src/icons/user.png';
 
-            const userRef=ref(db,`users/${uid}`);
+            const userRef = ref(db, `users/${uid}`);
 
-            await set(userRef,{
-                displayName:`Guest-${uid.slice(-4)}`,
-                photoURL:user.photoURL || 'src/icons/user.png',
-                isGuest:true,
-                matchId:null,
+            await set(userRef, {
+                displayName: `Guest-${uid.slice(-4)}`,
+                photoURL: user.photoURL || 'src/icons/user.png',
+                isGuest: true,
+                matchId: null,
                 createdAt: serverTimestamp(),
-                lastLogin:serverTimestamp()
+                lastLogin: serverTimestamp()
             })
 
         } catch (error) {
             console.log(error);
         }
-        
+
     })
 })
