@@ -27,6 +27,10 @@
 html,
 body {
   height: 100%;
+  overflow-x: hidden;
+  /* Không cho scroll ngang */
+  touch-action: pan-y;
+  /* Chỉ cho kéo dọc, cấm kéo ngang */
 }
 
 body {
