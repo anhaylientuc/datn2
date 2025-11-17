@@ -434,12 +434,10 @@ body {
 
 /* ========== Actions (Home / Resign) ========== */
 .actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  margin-top: 12px;
-  flex-wrap: wrap;
+  flex-direction: row;      /* vẫn là 1 hàng */
+    align-items: center;
+    flex-wrap: nowrap;        /* không cho xuống dòng */
+    gap: 8px;
 }
 
 .actions-left,
