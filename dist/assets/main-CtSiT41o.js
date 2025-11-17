@@ -1,1 +1,0 @@
-import"./piece-DEAYhcV3.js";import"./auth-Bhz18tjt.js";import"./app-2Mqvq-DZ.js";const o=t=>document.querySelector(t);o("#btn-login");const e=o("#btn-logout");o("#btn-findgame");document.getElementById("timer");let l=!1;e==null||e.addEventListener("click",async()=>{if(!l){l=!0,e.disabled=!0;try{console.log("ok"),await logout()}catch(t){alert(t.message),l=!1,e.disabled=!1}}});

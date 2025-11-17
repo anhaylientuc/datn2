@@ -10,6 +10,7 @@ export default defineConfig({
         main:   resolve(__dirname, 'index.html'),
         online: resolve(__dirname, 'online.html'), // ép build thêm trang này
         room: resolve(__dirname, 'room.html'),
+        room: resolve(__dirname, 'playAI.html'),
       },
     },
   },
