@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script type="module" crossorigin src="./assets/room-B2nc8pqq.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/app-B53PFQNM.js">
+  <link rel="stylesheet" crossorigin href="./assets/room-B2jnMdsr.css">
+</head>
+
+<body class="mode-online">
+  <header class="header">
+    <div class="left">
+      <span class="room-code">Room: <strong id="room-id">#123456</strong></span>
+    </div>
+    <div class="right">
+      <div class="timer" aria-live="polite">
+        <span>
+          <img class="ic" src="./assets/clock-Dh4bITzH.png" />
+        </span>
+        <!-- <span id="room-timer">00:00</span> -->
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- Overlay kết quả -->
+    <div class="overlay-result" id="overlay-result" role="dialog" aria-live="polite" aria-modal="true">
+      <div class="overlay-result__card">
+        <div class="overlay-result__title" id="result-title">You win!</div>
+        <p class="overlay-result__subtitle" id="result-subtitle">
+          Checkmate. Nice game!
+        </p>
+        <div class="overlay-result__footer">
+          <button class="btn ghost" id="btn-close-result">Close</button>
+          <!-- <button class="btn primary" id="btn-newgame-result">New game</button> -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Cột trái: Players + Board + Actions -->
+    <section class="column-board">
+      <!-- Players -->
+      <div class="card panel players">
+        <!-- TOP (Black / Opponent) -->
+        <div class="player" id="player-top">
+          <div class="avatar" aria-hidden="true">B</div>
+          <div>
+            <div class="name">
+              Black: <span class="muted" id="p2-name">Opponent</span>
+            </div>
+          </div>
+          <div class="meta">
+            <span class="turn-tag" id="p2-turn" aria-live="polite">Waiting...</span>
+            <div class="clock" id="p2-clock" aria-live="polite">10:00</div>
+          </div>
+        </div>
+
+        <!-- BOTTOM (White / You) -->
+        <div class="player" id="player-bottom">
+          <div class="avatar" aria-hidden="true">W</div>
+          <div>
+            <div class="name">
+              White: <span class="muted" id="p1-name">You</span>
+            </div>
+          </div>
+          <div class="meta">
+            <span class="turn-tag" id="p1-turn" aria-live="polite">Waiting...</span>
+            <div class="clock" id="p1-clock" aria-live="polite">10:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Board -->
+      <div class="board-wrap card">
+        <div class="board" id="board" role="grid" aria-label="Chess board"></div>
+
+        <div class="board-footer">
+          <div class="toolbar">
+            <button class="btn ghost" id="btn-undone" aria-label="Undo move">
+              <span class="ic">
+                <img src="./images/rotate-left.png" alt="" />
+              </span>
+              <span>Undo</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+        <div class="actions-left">
+          <button class="btn ghost" id="btn-home">Exit</button>
+          <button class="btn ghost" id="btn-newgame">New game</button>
+        </div>
+        <div class="actions-right">
+          <!-- <button class="btn" id="btn-offer-draw">Offer Draw</button> -->
+          <button class="btn danger" id="btn-resign">Resign</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cột phải: Move list -->
+    <aside class="column-side">
+      <div class="card-panel card">
+        <div class="muted" style="margin-bottom: 8px;">Move List</div>
+        <div class="moves" id="moves">
+          <ul></ul>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+</body>
+
+</html>
