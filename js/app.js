@@ -49,14 +49,14 @@ function fillColorBoard() {
         item.style.backgroundColor = (Math.floor(index / 8) + index) % 2 == 0 ? '#EEEED2' : '#769656';
     })
 }
-function loadData() {
-    renderBoard();
-    createEngine();
-    try {
-    } catch (error) {
-        console.log(error);
-    }
-}
+// function loadData() {
+//     renderBoard();
+//     createEngine();
+//     try {
+//     } catch (error) {
+//         console.log(error);
+//     }
+// }
 export function fmtBoard(fen) {
     const str = fen.split(' ');
     const rows = str[0].split('/');
