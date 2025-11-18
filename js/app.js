@@ -4,11 +4,18 @@ import { BOARD } from "./constants/piece";
 export let boardEl = null;
 export let engine = null;
 export let botMove = '';
+let hasRenderedBoard = false; // 👈 flag chặn render nhiều lần
 async function renderBoard() {
     try {
 
         if (!boardEl)
             boardEl = document.getElementById('board');
+         // nếu đã render rồi thì thôi
+        if (hasRenderedBoard) return;
+        hasRenderedBoard = true;
+
+        // an toàn hơn: dọn sạch trước khi vẽ
+        boardEl.innerHTML = '';
         let cols = 'ABCDEFGH';
         for (let i = 8; i >= 1; i--) {
             for (let j = 0; j < 8; j++) {
@@ -23,6 +30,17 @@ async function renderBoard() {
         fillColorBoard();
     } catch (error) {
         console.log(error);
+    }
+}
+let isInited = false;
+
+function loadData() {
+    if (isInited) return;   // 👈 nếu đã init rồi thì không làm lại
+    isInited = true;
+
+    renderBoard();
+    if (!engine) {
+        createEngine();
     }
 }
 function fillColorBoard() {
@@ -120,7 +138,7 @@ export function createEngine() {
     engine.postMessage('isready');
     return engine;
 }
-document.addEventListener('DOMContentLoaded', loadData);
+document.addEventListener('DOMContentLoaded', loadData,{ once: true });
 
 
 
