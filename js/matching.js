@@ -38,32 +38,32 @@ export async function findGame({ db, auth }) {
     }
     // --- lắng nghe khi có matchId, nhớ giữ off() để gỡ ---
 
-    offMatch = onValue(matchIdRef, async (snap) => {
-        const v = snap.val();
-        if (v == null) return;
+    // offMatch = onValue(matchIdRef, async (snap) => {
+    //     const v = snap.val();
+    //     if (v == null) return;
 
-        await teardown();
+    //     await teardown();
 
-        alert('[MATCHED] ' + v);
+    //     alert('[MATCHED] ' + v);
 
-        const matchRef = ref(db, `matches/${v}`);
-        const matchSnap = await get(matchRef);
-        const { a, b } = matchSnap.val();
-        const updates = {
-            [`users/${a}/side`]: 'white',
-            [`users/${b}/side`]: 'black',
+    //     const matchRef = ref(db, `matches/${v}`);
+    //     const matchSnap = await get(matchRef);
+    //     const { a, b } = matchSnap.val();
+    //     const updates = {
+    //         [`users/${a}/side`]: 'white',
+    //         [`users/${b}/side`]: 'black',
 
-        }
-        await update(ref(db), updates);
-        const sideA = (await get(ref(db, `users/${a}`))).val();
-        const sideB = (await get(ref(db, `users/${b}`))).val();
-        const url = new URL('room.html', window.location.origin);
-        url.searchParams.set('room', String(v));
-        window.location.href = url.href;
-        console.log(sideA,sideB);
+    //     }
+    //     await update(ref(db), updates);
+    //     const sideA = (await get(ref(db, `users/${a}`))).val();
+    //     const sideB = (await get(ref(db, `users/${b}`))).val();
+    //     const url = new URL('room.html', window.location.origin);
+    //     url.searchParams.set('room', String(v));
+    //     window.location.href = url.href;
+    //     console.log(sideA,sideB);
 
 
-    })
+    // })
     // vào hàng chờ
     await set(entryRef, { ts: Date.now(), claimedBy: null });
     const getCandidatesQ = query(entriesRef, limitToFirst(5));
@@ -85,11 +85,12 @@ export async function findGame({ db, auth }) {
         if (!claimed)
             continue;
 
+
         // nếu trong lúc claim mình đã bị match bởi người khác -> dừng
         const myMatchSnap = await get(matchIdRef);
         if (myMatchSnap.exists()) {
             await teardown();
-            resolve(myMatchSnap.val());
+            //resolve(myMatchSnap.val());
             return;
         }
 
@@ -105,7 +106,6 @@ export async function findGame({ db, auth }) {
                 board[cols[j]+(8-i)] = PIECES_AT[i][j];
             }
         }
-        printBoard(board);
         const updates = {
             [`users/${uid}/matchId`]: matchId,
             [`users/${oppUid}/matchId`]: matchId,

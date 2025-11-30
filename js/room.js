@@ -1,10 +1,9 @@
 import { get, update, set, onValue, onDisconnect } from "firebase/database";
 import { auth, db, ref } from "./firebase";
 import { boardEl, botMove, createEngine, printBoard } from "./app";
-import { botGo, fillPieces, undoMoves, botPause } from "./board";
+import {  fillPieces, undoMoves, botPause } from "./board";
 import { engine } from "./app";
 import { pieceMap, PIECES_AT } from "./constants/piece";
-export let globalBoard = {};
 let gMatchId = null, startBoard = null;
 export let gTimeW = 0, gTimeB = 0
 const toastResult = document.getElementById('overlay-result');

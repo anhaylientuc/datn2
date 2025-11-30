@@ -5,25 +5,43 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="css/room.css" />
+  <title>FWF Chess – Online Room</title>
 </head>
 
 <body class="mode-online">
+  <!-- TOP HUD -->
   <header class="header">
-    <div class="left">
-      <span class="room-code">Room: <strong id="room-id">#123456</strong></span>
+    <div class="header-left">
+      <div class="brand">
+        <div class="brand-mark">
+          <img src="src/icons/knight.png" alt="FWF" />
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">FWF Chess</span>
+          <span class="brand-subtitle">Online Match</span>
+        </div>
+      </div>
+
+      <span class="room-code">
+        Room: <strong id="room-id">#123456</strong>
+      </span>
     </div>
-    <div class="right">
+
+    <div class="header-right">
+      <div class="status-pill" id="match-status">Connecting…</div>
       <div class="timer" aria-live="polite">
-        <span>
-          <img class="ic" src="src/icons/clock.png" />
+        <span class="timer-icon">
+          <span class="ic">
+            <img src="src/icons/clock.png" alt="Clock" />
+          </span>
         </span>
-        <!-- <span id="room-timer">00:00</span> -->
+        <span id="room-timer" class="timer-text">10:00</span>
       </div>
     </div>
   </header>
 
-  <main class="wrap">
-    <!-- Overlay kết quả -->
+  <main class="room-wrap">
+    <!-- OVERLAY KẾT QUẢ -->
     <div class="overlay-result" id="overlay-result" role="dialog" aria-live="polite" aria-modal="true">
       <div class="overlay-result__card">
         <div class="overlay-result__title" id="result-title">You win!</div>
@@ -32,53 +50,63 @@
         </p>
         <div class="overlay-result__footer">
           <button class="btn ghost" id="btn-close-result">Close</button>
-          <!-- <button class="btn primary" id="btn-newgame-result">New game</button> -->
         </div>
       </div>
     </div>
 
-    <!-- Cột trái: Players + Board + Actions -->
-    <section class="column-board">
-      <!-- Players -->
-      <div class="card panel players">
-        <!-- TOP (Black / Opponent) -->
-        <div class="player" id="player-top">
-          <div class="avatar" aria-hidden="true">B</div>
-          <div>
-            <div class="name">
-              Black: <span class="muted" id="p2-name">Opponent</span>
+    <!-- CỘT TRÁI: PLAYERS + BOARD + ACTIONS -->
+    <section class="column-main">
+      <div class="card board-shell">
+        <!-- TOP PLAYER -->
+        <div class="vs-player vs-top" id="player-top">
+          <div class="avatar">
+            <span>B</span>
+          </div>
+          <div class="vs-info">
+            <div class="vs-name"><span id="p2-name">Opponent</span></div>
+            <div class="vs-meta">
+              <span class="vs-color muted">Black</span>
+              <span class="vs-elo muted" id="p2-elo"></span>
             </div>
           </div>
-          <div class="meta">
-            <span class="turn-tag" id="p2-turn" aria-live="polite">Waiting...</span>
+          <div class="vs-clock">
+            <span class="turn-tag" id="p2-turn" aria-live="polite">Waiting…</span>
             <div class="clock" id="p2-clock" aria-live="polite">10:00</div>
           </div>
         </div>
 
-        <!-- BOTTOM (White / You) -->
-        <div class="player" id="player-bottom">
-          <div class="avatar" aria-hidden="true">W</div>
-          <div>
-            <div class="name">
-              White: <span class="muted" id="p1-name">You</span>
+        <!-- BOARD -->
+        <div class="board-frame">
+          <div class="board" id="board" role="grid" aria-label="Chess board"></div>
+        </div>
+
+        <!-- BOTTOM PLAYER -->
+        <div class="vs-player vs-bottom" id="player-bottom">
+          <div class="avatar avatar-you">
+            <span>W</span>
+          </div>
+          <div class="vs-info">
+            <div class="vs-name"><span id="p1-name">You</span></div>
+            <div class="vs-meta">
+              <span class="vs-color muted">White</span>
+              <span class="vs-elo muted" id="p1-elo"></span>
             </div>
           </div>
-          <div class="meta">
-            <span class="turn-tag" id="p1-turn" aria-live="polite">Waiting...</span>
+          <div class="vs-clock">
+            <span class="turn-tag" id="p1-turn" aria-live="polite">Waiting…</span>
             <div class="clock" id="p1-clock" aria-live="polite">10:00</div>
           </div>
         </div>
-      </div>
 
-      <!-- Board -->
-      <div class="board-wrap card">
-        <div class="board" id="board" role="grid" aria-label="Chess board"></div>
-
+        <!-- BOARD FOOTER + UNDO -->
         <div class="board-footer">
+          <div class="board-status muted" id="board-status">
+            Waiting for opponent…
+          </div>
           <div class="toolbar">
             <button class="btn ghost" id="btn-undone" aria-label="Undo move">
-              <span class="ic">
-                <img src="/images/rotate-left.png" alt="" />
+              <span class="btn-icon">
+                <img src="src/icons/rotate-left.png" alt="" />
               </span>
               <span>Undo</span>
             </button>
@@ -86,23 +114,45 @@
         </div>
       </div>
 
-      <!-- Actions -->
-      <div class="actions">
+      <!-- ACTION BUTTONS -->
+      <div class="actions-row">
         <div class="actions-left">
-          <button class="btn ghost" id="btn-home">Exit</button>
-          <button class="btn ghost" id="btn-newgame">New game</button>
+          <button class="btn ghost" id="btn-home">Exit to menu</button>
+          <button class="btn ghost" id="btn-newgame">Restart</button>
         </div>
         <div class="actions-right">
-          <!-- <button class="btn" id="btn-offer-draw">Offer Draw</button> -->
           <button class="btn danger" id="btn-resign">Resign</button>
         </div>
       </div>
     </section>
 
-    <!-- Cột phải: Move list -->
+    <!-- CỘT PHẢI: MATCH INFO + MOVE LIST -->
     <aside class="column-side">
-      <div class="card-panel card">
-        <div class="muted" style="margin-bottom: 8px;">Move List</div>
+      <div class="card match-info-card">
+        <div class="match-info-header">
+          <div>
+            <div class="match-title">Match info</div>
+            <div class="match-subtitle muted" id="match-mode">
+              Blitz · Rated
+            </div>
+          </div>
+        </div>
+        <div class="match-tags">
+          <span class="tag" id="tag-rated">Rated</span>
+          <span class="tag" id="tag-time">10m · 0s</span>
+        </div>
+      </div>
+
+      <div class="card moves-card">
+        <div class="moves-header">
+          <div>
+            <div class="moves-title">Move list</div>
+            <div class="moves-subtitle muted">
+              Synced in real time for both players.
+            </div>
+          </div>
+        </div>
+
         <div class="moves" id="moves">
           <ul></ul>
         </div>

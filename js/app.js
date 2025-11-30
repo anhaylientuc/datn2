@@ -1,12 +1,12 @@
 
 
-import { BOARD } from "./constants/piece";
+import { BOARD,PIECES_AT } from "./constants/piece";
 export let boardEl = null;
 export let engine = null;
 export let botMove = '';
+export let globalBoard=null;
 async function renderBoard() {
     try {
-
         if (!boardEl)
             boardEl = document.getElementById('board');
         let cols = 'ABCDEFGH';
@@ -14,9 +14,9 @@ async function renderBoard() {
             for (let j = 0; j < 8; j++) {
                 const li = document.createElement('li');
                 li.className = 'square';
-                li.dataset.value = cols[j]+i;
-                li.dataset.rank=i;
-                li.dataset.file=cols[j];
+                li.dataset.value = cols[j] + i;
+                li.dataset.rank = i;
+                li.dataset.file = cols[j];
                 boardEl.appendChild(li);
             }
         }
@@ -33,6 +33,7 @@ function fillColorBoard() {
 }
 function loadData() {
     renderBoard();
+    createBoard();
     createEngine();
     try {
     } catch (error) {
@@ -85,7 +86,7 @@ export function fmtFEN(board, turn) {
         }
         if (cnt)
             line += cnt;
-        if (i >1)
+        if (i > 1)
             line += '/';
         fen += line;
     }
@@ -119,6 +120,17 @@ export function createEngine() {
     engine.postMessage('uci');
     engine.postMessage('isready');
     return engine;
+}
+export function createBoard() {
+    if(!globalBoard)
+        globalBoard={};
+    let cols = 'ABCDEFGH';
+    for (let i = 1; i <= 8; i++) {
+        for (let j = 0; j < 8; j++) {
+            const pos = cols[j] + (9 - i);
+            globalBoard[pos] = PIECES_AT[i - 1][j];
+        }
+    }
 }
 document.addEventListener('DOMContentLoaded', loadData);
 

@@ -2,9 +2,9 @@
 import { runTransaction, ref, onValue, get, update } from "firebase/database";
 import { pieceMap } from "./constants/piece";
 import { handleMove } from "./move";
-import { boardEl, fmtFEN, fmtBoard, printBoard } from "./app";
+import { boardEl, fmtFEN, fmtBoard, printBoard, globalBoard } from "./app";
 import { engine } from "./app";
-import { globalBoard, showResult, addMoveList, gTimeW, gTimeB, clearTimer } from "./room";
+import { showResult, addMoveList, gTimeW, gTimeB, clearTimer } from "./room";
 import { db } from "./firebase";
 let activePiece = null;
 let startLeft = 0, startTop = 0;
@@ -12,17 +12,12 @@ let startClientX = 0, startClientY = 0;
 let fromPos = null;
 let turn = '';
 let side = '', moveF = '', moveS = '';
-let gSide='';
-let curMove = '', whiteMove = '', blackMove = '';
-export let isCheck = false, undoMoves = [], botPause = false,gListMove=[];
+let gSide = '';
+let  whiteMove = '', blackMove = '',curMove = '';
+const eventsBus={};
+export let isCheck = false, undoMoves = [], botPause = false, gListMove = [];
 
-function parseMove(uci) {
-    const fromCol = uci[0].toUpperCase();
-    const fromRow = uci[1];
-    const toCol = uci[2].toUpperCase();
-    const toRow = uci[3];
-    return { from: fromCol + fromRow, to: toCol + toRow };
-}
+
 function clearSuggestMove() {
     document.querySelectorAll('.is-move, .is-capture')
         .forEach(el => el.classList.remove('is-move', 'is-capture'));
@@ -40,9 +35,9 @@ function fmtMove(piece, from, to) {
     line += to.toLowerCase();
     return line;
 }
-export function fillPieces(mode, side, canGo) {
+export function fillPieces() {
     clearSuggestMove();
-    gSide=side;
+    gSide = side;
     document.querySelectorAll('.is-current')
         .forEach(el => el.classList.remove('is-current'));
     const curSquare = document.querySelector(`#board li[data-value="${curMove}"]`);
@@ -52,16 +47,17 @@ export function fillPieces(mode, side, canGo) {
         cur.innerHTML = '';
         const pos = cur.dataset.value;
         if (globalBoard[pos] != '.') {
+
             const name = globalBoard[pos];
             const p = document.createElement('div');
             p.className = 'piece';
-            p.classList.add('is-disabled');
-            if (canGo) {
-                if (side == 'white' && (name == 'P' || name == 'R' || name == 'N' || name == 'B' || name == 'Q' || name == 'K'))
-                    p.classList.remove('is-disabled');
-                if (side == 'black' && (name == 'p' || name == 'r' || name == 'n' || name == 'b' || name == 'q' || name == 'k'))
-                    p.classList.remove('is-disabled');
-            }
+            //p.classList.add('is-disabled');
+            // if (canGo) {
+            //     if (side == 'white' && (name == 'P' || name == 'R' || name == 'N' || name == 'B' || name == 'Q' || name == 'K'))
+            //         p.classList.remove('is-disabled');
+            //     if (side == 'black' && (name == 'p' || name == 'r' || name == 'n' || name == 'b' || name == 'q' || name == 'k'))
+            //         p.classList.remove('is-disabled');
+            // }
             p.dataset.value = name;
             const imgPiece = document.createElement('img');
             imgPiece.src = pieceMap.get(name);
@@ -70,11 +66,11 @@ export function fillPieces(mode, side, canGo) {
             cur.appendChild(p);
         }
     })
-    ensureDelegationBound(mode);
+    ensureDelegationBound();
 }
 let delegationBound = false;
 
-function ensureDelegationBound(mode) {
+function ensureDelegationBound() {
     if (delegationBound)
         return;
     delegationBound = true;
@@ -82,9 +78,10 @@ function ensureDelegationBound(mode) {
     let moves = null, kill = null;
     boardEl.addEventListener('pointerdown', e => {
         const piece = e.target.closest('.piece');
-        if (!piece || !boardEl.contains(piece) || side != turn) {
+        if (!piece || !boardEl.contains(piece) ) {
             return;
         }
+        console.log('cc');
         activePiece = piece;
         fromPos = activePiece.parentElement?.dataset?.value || null
         from = fromPos;
@@ -135,7 +132,7 @@ function ensureDelegationBound(mode) {
         fromPos = null;
         if (!moves.find(i => i == to) && !kill.find(i => i == to)) {
             clearSuggestMove();
-            fillPieces(mode,gSide,1);
+            fillPieces();
             return;
         }
 
@@ -144,57 +141,60 @@ function ensureDelegationBound(mode) {
             moveF = fmtMove(pieceEl.dataset.value, from, to);
             undoMoves.push({ move: from + to, capture: globalBoard[to] });
             console.log(moveF);
-            const checked=globalBoard[to].toUpperCase()=='K'?1:0;
+            const checked = globalBoard[to].toUpperCase() == 'K' ? 1 : 0;
             globalBoard[from] = '.';
             globalBoard[to] = pieceEl.dataset.value;
             curMove = to;
 
-
-            fillPieces(mode);
-            const { m, k } = handleMove({ name: activePiece.dataset.value }, to, globalBoard);
-            moves = m;
-            kill = k;
+            emit('board-change',globalBoard);
 
 
 
-
-
-            const check = kill.find(move => globalBoard[move].toLowerCase() == 'k')
-            if (check) {
-                moveF += '+';
-            }
-            activePiece = null;
+            // fillPieces(mode);
+            // const { m, k } = handleMove({ name: activePiece.dataset.value }, to, globalBoard);
+            // moves = m;
+            // kill = k;
 
 
 
-            if (globalBoard[to] == 'k') {
-                showResult('win');
-            }
-            whiteMove = curMove.toLowerCase();
-            if (mode != 'bot') {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const uid = user.uid;
-                const snap = await get(ref(db, `users/${uid}`));
-                const {matchId,side} = snap.val();
 
-                const matchRef=ref(db,`matches/${matchId}`);
-                const snapMatch=await get(matchRef);
-                let {listMoves}=snapMatch.val();
-                listMoves=listMoves||[];
-                listMoves.push(moveF);
-                clearTimer();
-                await update(ref(db, `matches/${matchId}`), {   
-                    board:globalBoard,
-                    turn:side=='white'?'black':'white',
-                    winner:checked?uid:'none',
-                    timeW:gTimeW,
-                    timeB:gTimeB,
-                    listMoves:listMoves
-                });
-                return;
-            }
-            gListMove.push(moveF);
-            botGo(globalBoard, 'black');
+
+            // const check = kill.find(move => globalBoard[move].toLowerCase() == 'k')
+            // if (check) {
+            //     moveF += '+';
+            // }
+            // activePiece = null;
+
+
+
+            // if (globalBoard[to] == 'k') {
+            //     showResult('win');
+            // }
+            // whiteMove = curMove.toLowerCase();
+            // if (mode != 'bot') {
+            //     const user = JSON.parse(localStorage.getItem('user'));
+            //     const uid = user.uid;
+            //     const snap = await get(ref(db, `users/${uid}`));
+            //     const { matchId, side } = snap.val();
+
+            //     const matchRef = ref(db, `matches/${matchId}`);
+            //     const snapMatch = await get(matchRef);
+            //     let { listMoves } = snapMatch.val();
+            //     listMoves = listMoves || [];
+            //     listMoves.push(moveF);
+            //     clearTimer();
+            //     await update(ref(db, `matches/${matchId}`), {
+            //         board: globalBoard,
+            //         turn: side == 'white' ? 'black' : 'white',
+            //         winner: checked ? uid : 'none',
+            //         timeW: gTimeW,
+            //         timeB: gTimeB,
+            //         listMoves: listMoves
+            //     });
+            //     return;
+            // }
+            // gListMove.push(moveF);
+            // botGo(globalBoard, 'black');
 
         } catch (error) {
             console.log(error);
@@ -223,44 +223,16 @@ function markKills(moves) {
     })
 }
 
-export function botGo(globalBoard) {
-    const fen = fmtFEN(globalBoard, 'black');
-    engine.postMessage(`position fen ${fen}`);
-    engine.postMessage('go depth 10');
-    engine.onmessage = (e) => {
-        const line = typeof e.data === 'string' ? e.data : e;
-        if (line.startsWith('bestmove')) {
-            const move = line.split(' ')[1];
-            const parse = parseMove(move);
-            const { from, to } = parse;
-            curMove = to;
 
-            if (move == '(none)') {
-                showResult('lose');
-            }
-
-            setTimeout(() => {
-                moveS = fmtMove(globalBoard[from], from, to);
-                undoMoves.push({ move: from + to, capture: globalBoard[to] });
-                gListMove.push(moveS);
-                curMove = to;
-                globalBoard[to] = globalBoard[from];
-                globalBoard[from] = '.';
-                blackMove = curMove.toLowerCase();
-                const { m, k } = handleMove({ name: globalBoard[to] }, to, globalBoard);
-                let kill = k;
-
-                const check = kill.find(move => globalBoard[move].toLowerCase() == 'k')
-                if (check) {
-                    moveS += '+';
-                }
-                fillPieces('bot','white',1);
-                addMoveList(gListMove);
-            }, 1000); // 1000ms = 1
-
-        }
-    };
-    engine.onerror = (err) => {
-        console.error('[ENGINE ERROR]', err);
-    };
+function emit(name,data)
+{
+    eventsBus[name]?.forEach(fn=>fn(data))
 }
+export function on(name,fn)
+{
+    (eventsBus[name]||=[]).push(fn);
+}
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('ok');
+    fillPieces();
+})

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Dùng lại index.css để có màu, biến, button... -->
+  <link rel="stylesheet" href="css/index.css" />
+  <!-- CSS riêng cho trang Settings -->
+  <link rel="stylesheet" href="css/settings.css" />
+  <title>Settings | FWF Chess</title>
+</head>
+
+<body>
+  <!-- Thanh top-bar chứa user-card + logout (chỉ hiện khi đã auth) -->
+  <!-- <header class="top-bar when-auth">
+    <div class="user-card" id="user-card">
+      <div class="ic">
+        <img src="src/icons/user.png" alt="Avatar" />
+      </div>
+      <div class="user-info">
+        <span class="username">You</span>
+        <button id="btn-logout-settings" class="link-logout" type="button">
+          Sign out
+        </button>
+      </div>
+    </div>
+  </header> -->
+
+  <main class="settings-page">
+    <!-- Nếu chưa auth: có thể hiện message đơn giản -->
+    <!-- <section class="settings-guest when-guest">
+      <div class="card settings-guest-card">
+        <h1>Settings</h1>
+        <p class="muted">
+          You need to sign in to sync your preferences across devices.
+        </p>
+        <p class="muted small">
+          Go back to the main screen and sign in with Google or play as guest.
+        </p>
+      </div>
+    </section> -->
+
+    <!-- Layout chính khi đã đăng nhập -->
+    <section class="settings-layout when-auth">
+      <div class="settings-left">
+        <h1 class="settings-title">Settings</h1>
+        <p class="settings-subtitle muted">
+          Customize how FWF Chess looks and feels. Preferences can be saved per account.
+        </p>
+
+        <div class="settings-tip card">
+          <p class="small">
+            Tip: Use a simple board theme and disable heavy animations if you want maximum clarity during fast games.
+          </p>
+        </div>
+      </div>
+
+      <div class="settings-right">
+        <div class="card settings-card">
+          <!-- Board theme -->
+          <section class="settings-group">
+            <h2 class="settings-group-title">Board theme</h2>
+            <p class="settings-group-desc muted small">
+              Choose how your chessboard looks.
+            </p>
+            <div class="settings-options">
+              <label class="option-pill">
+                <input type="radio" name="board-theme" value="classic" checked />
+                <span>Classic</span>
+              </label>
+              <label class="option-pill">
+                <input type="radio" name="board-theme" value="blue" />
+                <span>Blue</span>
+              </label>
+              <label class="option-pill">
+                <input type="radio" name="board-theme" value="wood" />
+                <span>Wood</span>
+              </label>
+            </div>
+          </section>
+
+          <!-- Piece style -->
+          <section class="settings-group">
+            <h2 class="settings-group-title">Piece style</h2>
+            <p class="settings-group-desc muted small">
+              Change how the pieces are rendered.
+            </p>
+            <div class="settings-row">
+              <select id="piece-style">
+                <option value="neo">Neo (default)</option>
+                <option value="classic">Classic</option>
+                <option value="alpha">Alpha shapes</option>
+              </select>
+            </div>
+          </section>
+
+          <!-- Sound -->
+          <section class="settings-group">
+            <h2 class="settings-group-title">Sound</h2>
+            <div class="settings-row">
+              <label class="toggle">
+                <input type="checkbox" id="sound-move" checked />
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Move sounds</span>
+              </label>
+            </div>
+            <div class="settings-row">
+              <label class="toggle">
+                <input type="checkbox" id="sound-notif" checked />
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Notifications (match found, time low)</span>
+              </label>
+            </div>
+          </section>
+
+          <!-- Highlights -->
+          <section class="settings-group">
+            <h2 class="settings-group-title">Move highlights</h2>
+            <div class="settings-row">
+              <label class="toggle">
+                <input type="checkbox" id="highlight-legal" checked />
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Show legal moves</span>
+              </label>
+            </div>
+            <div class="settings-row">
+              <label class="toggle">
+                <input type="checkbox" id="highlight-last" checked />
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Highlight last move</span>
+              </label>
+            </div>
+          </section>
+
+          <!-- Language -->
+          <section class="settings-group">
+            <h2 class="settings-group-title">Language</h2>
+            <div class="settings-row">
+              <select id="language">
+                <option value="en">English</option>
+                <option value="vi">Tiếng Việt</option>
+              </select>
+            </div>
+          </section>
+
+          <!-- Logout (trong card) -->
+          <section class="settings-group settings-danger">
+            <h2 class="settings-group-title">Account</h2>
+            <button type="button" class="btn-logout-danger" id="btn-logout-danger">
+              <img src="/icons/logout.png" alt="" class="ic16" />
+              Sign out from this device
+            </button>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Scripts giống index (auth + firebase + app logic) -->
+  <script type="module" src="js/auth.js"></script>
+  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/settings.js"></script>
+  <script type="module" src="js/firebase.js"></script>
+</body>
+
+</html>
