@@ -93,28 +93,30 @@ function fmtTime(time) {
 //     //fillPieces('bot');
 // }
 function highlightCheck() {
-    let res = null;
-    //const { name, from, to } = oppMove;
-    let posCheck = false;
+    let wCheck=null,bCheck=null;
     for (const [pos, piece] of Object.entries(globalBoard)) {
         if (globalBoard[pos] == '.')
             continue;
         const { m, k } = handleMove(piece, pos);
-        posCheck = k.find(move => globalBoard[move] == 'K' || globalBoard[move] == 'k');
-        if (posCheck)
-            break;
+        const w = k.find(move => globalBoard[move] == 'K' );
+        const b = k.find(move => globalBoard[move] == 'k' );
+        if(w) wCheck=w;
+        if(b) bCheck=b;
     }
+    if(wCheck&&bCheck){
+        return 'invalid';
+    }
+    console.log(wCheck,bCheck);
     const squares = document.querySelectorAll('.square');
     squares.forEach(sq => {
-        if (sq.dataset.value == posCheck) {
-            res = posCheck;
+        if (sq.dataset.value == (wCheck||bCheck)) {
             sq.classList.add('is-check');
         }
         else {
             sq.classList.remove('is-check');
         }
     })
-    return res;
+    return wCheck?'w':null||bCheck?'b':null;
 }
 export function getLastMove() {
     return lastMove;
@@ -274,11 +276,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         globalBoard[to] = name;
         fillPieces(turn, side);
         //then check
-        const pos = highlightCheck();
-        if (pos) {
-            const king = globalBoard[pos];
-            const isWhite = (king == king.toUpperCase()) ? 'white' : 'black';
-            if (side == isWhite) {
+        const sideCheck = highlightCheck();
+        if (sideCheck) {
+            // const king = globalBoard[pos];
+            // const isWhite = (king == king.toUpperCase()) ? 'white' : 'black';
+            if (side==sideCheck||sideCheck=='invalid') {
                 //roll back
                 globalBoard[from] = name;
                 globalBoard[to] = capture;
