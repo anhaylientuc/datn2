@@ -2,65 +2,205 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/playAI.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/playAI.css" />
+  <title>Play vs AI | FWF Chess</title>
 </head>
 
-<body>
-    <div class="board-wrap card">
-        <div class="board-layout">
-            <!-- CỘT TRÁI: Bàn cờ + Turn + Undo/Redo -->
-            <div class="board-main">
-                <div class="board" id="board" role="grid" aria-label="Chess board"></div>
-
-                <div class="coords">
-                    <span class="muted">Turn: <strong id="turn">white</strong></span>
-                </div>
-
-                <div class="toolbar">
-                    <button class="btn ghost" id="btn-undo">Undo</button>
-                    <button class="btn ghost" id="btn-redo">Redo</button>
-                </div>
-            </div>
-
-            <!-- CỘT PHẢI: Moves -->
-            <aside class="moves-panel" aria-label="Move history">
-                <div class="moves-wrap">
-                    <div class="moves-header">
-                        <span class="moves-title">Moves</span>
-                        <button class="btn ghost btn-sm" id="btn-clear-moves">Clear</button>
-                    </div>
-                    <div class="moves-list" id="moves-list" role="log" aria-label="Move history list">
-                        <!-- JS append move-pill ở đây -->
-                    </div>
-                </div>
-            </aside>
+<body class="mode-ai">
+  <!-- Header giống game -->
+  <header class="header">
+    <div class="header-left">
+      <div class="brand">
+        <div class="brand-mark">
+          <img src="/icons/strategy.png" alt="FWF" />
         </div>
+        <div class="brand-text">
+          <div class="brand-title">FWF Chess</div>
+          <div class="brand-subtitle">Play vs AI</div>
+        </div>
+      </div>
     </div>
+    <div class="header-right">
+      <div class="header-pill">
+        <span class="dot"></span>
+        Local engine active
+      </div>
+    </div>
+  </header>
 
-    <div class="toast toast-difficulty" id="toast-difficulty" role="dialog" aria-live="polite">
-        <div style="flex:1 1 auto;">
-            <div class="toast__title">Choose difficulty</div>
-            <p class="toast__subtitle">Higher level = stronger & slower AI. You can change it later.</p>
-            <div class="toast__options">
-                <button class="chip is-active" data-level="easy">Easy</button>
-                <button class="chip" data-level="normal">Medium</button>
-                <button class="chip" data-level="hard">Hard</button>
+  <main class="page">
+    <section class="room">
+      <!-- Cột trái: You vs Engine + Board -->
+      <section class="column-main">
+        <!-- VS panel -->
+        <div class="card vs-card">
+          <div class="vs-player vs-top">
+            <div class="avatar avatar-bot" aria-hidden="true">
+              <img src="src/icons/robot-face.png" alt="AI" />
             </div>
+            <div class="vs-info">
+              <div class="vs-name">Engine</div>
+              <div class="vs-meta">
+                <span class="muted">Side:</span>
+                <span class="vs-side" id="ai-side">Black</span>
+              </div>
+            </div>
+            <div class="vs-extra">
+              <span class="pill pill-small" id="ai-level-pill">Level: Easy</span>
+            </div>
+          </div>
 
-            <!-- footer mới: nút xác nhận -->
-            <div class="toast__footer">
-                <button class="btn primary" id="btn-confirm-diff">Start game</button>
+          <div class="vs-center">
+            <span class="vs-label">VS</span>
+          </div>
+
+          <div class="vs-player vs-bottom">
+            <div class="avatar avatar-you" aria-hidden="true">
+              <img src="src/icons/user.png" alt="You" />
             </div>
+            <div class="vs-info">
+              <div class="vs-name">You</div>
+              <div class="vs-meta">
+                <span class="muted">Side:</span>
+                <span class="vs-side" id="human-side">White</span>
+              </div>
+            </div>
+            <div class="vs-extra">
+              <span class="muted small">Turn: <strong id="turn">white</strong></span>
+            </div>
+          </div>
         </div>
 
-        <button class="toast__close" id="btn-close-diff" aria-label="Close">×</button>
+        <!-- Board card -->
+        <div class="card board-card">
+          <div class="board" id="board" role="grid" aria-label="Chess board"></div>
+
+          <div class="board-footer">
+            <div class="board-status muted" id="board-status">
+              Drag a piece to start. AI moves after you.
+            </div>
+            <div class="toolbar">
+              <button class="btn ghost" id="btn-undo">Undo</button>
+              <button class="btn ghost" id="btn-redo">Redo</button>
+              <button class="btn ghost" id="btn-clear-moves">Clear moves</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cột phải: Difficulty + Moves -->
+      <aside class="column-side">
+        <!-- Difficulty panel (giữ id toast-difficulty) -->
+        <section class="card ai-card" id="toast-difficulty" aria-label="AI difficulty">
+          <div class="ai-header">
+            <div>
+              <div class="toast__title">Difficulty</div>
+              <p class="toast__subtitle">
+                Higher level = stronger &amp; slower engine. You can change it anytime.
+              </p>
+            </div>
+            <button class="toast__close" id="btn-close-diff" aria-label="Close">×</button>
+          </div>
+
+          <div class="toast__options">
+            <button class="chip is-active" data-level="easy">Easy</button>
+            <button class="chip" data-level="normal">Medium</button>
+            <button class="chip" data-level="hard">Hard</button>
+          </div>
+
+          <div class="ai-footer">
+            <button class="btn primary" id="btn-confirm-diff">Apply</button>
+          </div>
+        </section>
+
+        <!-- Moves -->
+        <section class="card moves-card" aria-label="Move history">
+          <div class="moves-head">
+            <div>
+              <div class="moves-title">Move list</div>
+              <div class="moves-subtitle muted small">
+                Moves are grouped in pairs: your move and AI’s reply.
+              </div>
+            </div>
+          </div>
+
+          <div class="moves-list" id="moves-list" role="log" aria-label="Move history list">
+            <!-- JS append move-pill ở đây -->
+          </div>
+        </section>
+      </aside>
+    </section>
+  </main>
 
 
+  <div class="overlay-result overlay-result--win" id="overlay-result" role="dialog" aria-live="polite"
+    aria-modal="true">
+    <div class="overlay-result__card">
+
+      <div class="overlay-result__icon">
+        <img id="result-icon" src="src/icons/icon-win.png" alt="Result Icon">
+      </div>
+
+      <div class="overlay-result__badge" id="result-badge">Victory</div>
+      <div class="overlay-result__title" id="result-title">You win!</div>
+      <p class="overlay-result__subtitle" id="result-subtitle"></p>
+
+      <div class="overlay-result__footer">
+        <button class="btn ghost" id="btn-close-result">Back</button>
+      </div>
     </div>
-   
-    <script type="module" src="js/playAI.js"></script>
+  </div>
+   <!-- OVERLAY PHONG CẤP -->
+    <div class="overlay-promotion" id="overlay-promotion" role="dialog" aria-modal="true" aria-live="polite">
+      <div class="overlay-promotion__card">
+        <div class="overlay-promotion__title">Promote pawn</div>
+        <p class="overlay-promotion__subtitle">
+          Choose a piece to promote your pawn.
+        </p>
+
+        <div class="promotion-grid" aria-label="Promotion choices">
+          <!-- Queen -->
+          <button class="promotion-item" data-piece="Q">
+            <div class="promotion-piece">
+              <img src="src/pieces/wQ.png" alt="Queen" />
+            </div>
+            <span class="promotion-label">Queen</span>
+          </button>
+
+          <!-- Rook -->
+          <button class="promotion-item" data-piece="R">
+            <div class="promotion-piece">
+              <img src="src/pieces/wR.png" alt="Rook" />
+            </div>
+            <span class="promotion-label">Rook</span>
+          </button>
+
+          <!-- Bishop -->
+          <button class="promotion-item" data-piece="B">
+            <div class="promotion-piece">
+              <img src="src/pieces/wB.png" alt="Bishop" />
+            </div>
+            <span class="promotion-label">Bishop</span>
+          </button>
+
+          <!-- Knight -->
+          <button class="promotion-item" data-piece="N">
+            <div class="promotion-piece">
+              <img src="src/pieces/wN.png" alt="Knight" />
+            </div>
+            <span class="promotion-label">Knight</span>
+          </button>
+        </div>
+
+        <div class="overlay-promotion__footer">
+          <button class="btn ghost" id="btn-promotion-cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+  <script type="module" src="js/playAI.js"></script>
+  <script type="module" src="js/board.js"></script>
 </body>
 
 </html>

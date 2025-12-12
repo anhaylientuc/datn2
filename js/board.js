@@ -1,28 +1,21 @@
 
-import { runTransaction, ref, onValue, get, update } from "firebase/database";
-import { pieceMap } from "./constants/piece";
+import { pieceMap, isMove } from "./constants/piece";
 import { handleMove } from "./move";
-import { boardEl, fmtFEN, fmtBoard, printBoard } from "./app";
-import { engine } from "./app";
-import { globalBoard, showResult, addMoveList, gTimeW, gTimeB, clearTimer } from "./room";
-import { db } from "./firebase";
+import { printBoard, globalBoard } from "./app";
+import { getLastMove } from "./room";
 let activePiece = null;
 let startLeft = 0, startTop = 0;
 let startClientX = 0, startClientY = 0;
 let fromPos = null;
-let turn = '';
-let side = '', moveF = '', moveS = '';
-let gSide='';
-let curMove = '', whiteMove = '', blackMove = '';
-export let isCheck = false, undoMoves = [], botPause = false,gListMove=[];
-
-function parseMove(uci) {
-    const fromCol = uci[0].toUpperCase();
-    const fromRow = uci[1];
-    const toCol = uci[2].toUpperCase();
-    const toRow = uci[3];
-    return { from: fromCol + fromRow, to: toCol + toRow };
-}
+let moveF = '', moveS = '';
+let whiteMove = '', blackMove = '', curMove = '';
+let name = '', curFrom = '', curTo = '';
+let boardEl = null;
+export let castlingMove = [], enPassantMove = null;
+const eventsBus = {};
+export let isCheck = false, undoMoves = [], botPause = false, gListMove = [];
+let overplayPromotion = null, piecePromotion = null;
+let Turn = '', Side = '';
 function clearSuggestMove() {
     document.querySelectorAll('.is-move, .is-capture')
         .forEach(el => el.classList.remove('is-move', 'is-capture'));
@@ -40,41 +33,62 @@ function fmtMove(piece, from, to) {
     line += to.toLowerCase();
     return line;
 }
-export function fillPieces(mode, side, canGo) {
+function setCastlingMove(moves) {
+    castlingMove = moves
+}
+export function getCastlingMove() {
+    return castlingMove;
+}
+function setEnPassantMove(move) {
+    enPassantMove = move;
+}
+export function getEnPassantMove() {
+    return enPassantMove;
+}
+function lockEnemy(turn, side) {
+
+    const pieces = document.querySelectorAll('.piece');
+    const canGo = turn == side;
+    pieces.forEach(p => {
+        const nameP = p.dataset.value;
+        p.classList.add('is-disabled');
+        const isWhite = nameP == nameP.toUpperCase();
+        if (canGo) {
+            if (side == 'white' && isWhite)
+                p.classList.remove('is-disabled');
+            if (side == 'black' && !isWhite)
+                p.classList.remove('is-disabled');
+        }
+
+    })
+}
+export function fillPieces(turn, side) {
     clearSuggestMove();
-    gSide=side;
-    document.querySelectorAll('.is-current')
-        .forEach(el => el.classList.remove('is-current'));
-    const curSquare = document.querySelector(`#board li[data-value="${curMove}"]`);
-    curSquare?.classList.add('is-current');
     const squares = document.querySelectorAll('#board li');
+    Turn = turn;
+    Side = side;
     squares.forEach(cur => {
         cur.innerHTML = '';
         const pos = cur.dataset.value;
         if (globalBoard[pos] != '.') {
-            const name = globalBoard[pos];
+
+            const nameP = globalBoard[pos];
             const p = document.createElement('div');
             p.className = 'piece';
-            p.classList.add('is-disabled');
-            if (canGo) {
-                if (side == 'white' && (name == 'P' || name == 'R' || name == 'N' || name == 'B' || name == 'Q' || name == 'K'))
-                    p.classList.remove('is-disabled');
-                if (side == 'black' && (name == 'p' || name == 'r' || name == 'n' || name == 'b' || name == 'q' || name == 'k'))
-                    p.classList.remove('is-disabled');
-            }
-            p.dataset.value = name;
+            p.dataset.value = nameP;
             const imgPiece = document.createElement('img');
-            imgPiece.src = pieceMap.get(name);
+            imgPiece.src = pieceMap.get(nameP);
 
             p.appendChild(imgPiece);
             cur.appendChild(p);
         }
     })
-    ensureDelegationBound(mode);
+    lockEnemy(Turn, Side);
+    ensureDelegationBound();
 }
 let delegationBound = false;
 
-function ensureDelegationBound(mode) {
+function ensureDelegationBound() {
     if (delegationBound)
         return;
     delegationBound = true;
@@ -82,26 +96,49 @@ function ensureDelegationBound(mode) {
     let moves = null, kill = null;
     boardEl.addEventListener('pointerdown', e => {
         const piece = e.target.closest('.piece');
-        if (!piece || !boardEl.contains(piece) || side != turn) {
+        if (!piece || !boardEl.contains(piece)) {
             return;
         }
         activePiece = piece;
+        name = activePiece.dataset.value;
         fromPos = activePiece.parentElement?.dataset?.value || null
         from = fromPos;
-        const { m, k } = handleMove({ name: activePiece.dataset.value }, from, globalBoard);
+        if (name == 'K' || name == 'k') {
+            const res = checkCastling(from);
+            setCastlingMove(res);
+        }
+        if ((name == 'P' || name == 'p') && (from[1] == '4' || from[1] == '5')) {
+            const ans = checkEnPassant(from);
+            setEnPassantMove(ans);
+        }
+        const { m, k } = handleMove(activePiece.dataset.value, from);
         moves = m;
         kill = k;
         markMoves(m);
         markKills(k);
-        activePiece.style.zIndex = 1;
+        activePiece.style.zIndex = 10;
         activePiece.style.cursor = 'grabbing';
 
         startClientX = e.clientX;
         startClientY = e.clientY;
 
-        const cs = getComputedStyle(activePiece);
-        startLeft = Number.isNaN(parseFloat(cs.left)) ? 0 : parseFloat(cs.left);
-        startTop = Number.isNaN(parseFloat(cs.top)) ? 0 : parseFloat(cs.top);
+      
+        const rect = activePiece.getBoundingClientRect();
+        const boardRect = boardEl.getBoundingClientRect();
+        const w = rect.width;
+        const h = rect.height;
+        activePiece.style.position = 'absolute';
+
+        startLeft = rect.left - boardEl.getBoundingClientRect().left;
+        startTop = rect.top - boardEl.getBoundingClientRect().top;
+
+
+        activePiece.style.left = startLeft + 'px';
+        activePiece.style.top = startTop + 'px';
+
+        activePiece.style.width = w + 'px';
+        activePiece.style.height = h + 'px';
+        boardEl.appendChild(activePiece);
         e.preventDefault();
     })
     boardEl.addEventListener('pointermove', e => {
@@ -109,14 +146,19 @@ function ensureDelegationBound(mode) {
             return;
         const dx = e.clientX - startClientX;
         const dy = e.clientY - startClientY;
-
-        activePiece.style.left = startLeft + dx + 'px';
-        activePiece.style.top = startTop + dy + 'px';
+        const boardBox = boardEl.getBoundingClientRect();
+        let x = startLeft + dx;
+        let y = startTop + dy;
+        x = Math.max(0, Math.min(boardBox.width - activePiece.offsetWidth, x));
+        y = Math.max(0, Math.min(boardBox.height - activePiece.offsetHeight, y));
+        activePiece.style.left = x + 'px';
+        activePiece.style.top = y + 'px';
     })
     boardEl.addEventListener('pointerup', async e => {
 
-        if (!activePiece)
+        if (!activePiece) {
             return;
+        }
         const pieceEl = activePiece;
 
         pieceEl.style.zIndex = '';
@@ -126,6 +168,7 @@ function ensureDelegationBound(mode) {
         let dropSquare = document.elementFromPoint(e.clientX, e.clientY).closest('.square');
         const to = dropSquare.dataset.value;
         pieceEl.style.pointerEvents = '';
+        pieceEl.remove();
         if (!dropSquare || !fromPos) {
             pieceEl.style.left = '0px';
             pieceEl.style.top = '0px';
@@ -135,66 +178,41 @@ function ensureDelegationBound(mode) {
         fromPos = null;
         if (!moves.find(i => i == to) && !kill.find(i => i == to)) {
             clearSuggestMove();
-            fillPieces(mode,gSide,1);
+            fillPieces(Turn, Side);
             return;
         }
 
-
         try {
-            moveF = fmtMove(pieceEl.dataset.value, from, to);
+            moveF = fmtMove(name, from, to);
             undoMoves.push({ move: from + to, capture: globalBoard[to] });
-            console.log(moveF);
-            const checked=globalBoard[to].toUpperCase()=='K'?1:0;
-            globalBoard[from] = '.';
-            globalBoard[to] = pieceEl.dataset.value;
+            const checked = globalBoard[to].toUpperCase() == 'K' ? 1 : 0;
             curMove = to;
-
-
-            fillPieces(mode);
-            const { m, k } = handleMove({ name: activePiece.dataset.value }, to, globalBoard);
-            moves = m;
-            kill = k;
-
-
-
-
-
-            const check = kill.find(move => globalBoard[move].toLowerCase() == 'k')
-            if (check) {
-                moveF += '+';
+            isMove[from] = true;
+            if ((name == 'K' || name == 'k')) {
+                const delta = to[0].charCodeAt(0) - from[0].charCodeAt(0);
+                if (delta == -2) {
+                    globalBoard['D' + from[1]] = globalBoard['A' + from[1]];
+                    globalBoard['A' + from[1]] = '.';
+                }
+                if (delta == 2) {
+                    globalBoard['F' + from[1]] = globalBoard['H' + from[1]];
+                    globalBoard['H' + from[1]] = '.';
+                }
             }
-            activePiece = null;
 
-
-
-            if (globalBoard[to] == 'k') {
-                showResult('win');
-            }
-            whiteMove = curMove.toLowerCase();
-            if (mode != 'bot') {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const uid = user.uid;
-                const snap = await get(ref(db, `users/${uid}`));
-                const {matchId,side} = snap.val();
-
-                const matchRef=ref(db,`matches/${matchId}`);
-                const snapMatch=await get(matchRef);
-                let {listMoves}=snapMatch.val();
-                listMoves=listMoves||[];
-                listMoves.push(moveF);
-                clearTimer();
-                await update(ref(db, `matches/${matchId}`), {   
-                    board:globalBoard,
-                    turn:side=='white'?'black':'white',
-                    winner:checked?uid:'none',
-                    timeW:gTimeW,
-                    timeB:gTimeB,
-                    listMoves:listMoves
-                });
+            if ((name == 'P' || name == 'p') && (to[1] == '1' || to[1] == '8')) {
+                showPromotion(name, from, to);
                 return;
             }
-            gListMove.push(moveF);
-            botGo(globalBoard, 'black');
+            if ((name == 'P' || name == 'p') && enPassantMove) {
+                if (name == 'P')
+                    globalBoard[to[0] + (parseInt(to[1]) - 1)] = '.';
+                if (name == 'p')
+                    globalBoard[to[0] + (parseInt(to[1]) + 1)] = '.';
+                enPassantMove=null
+            }
+
+            emit('board-change', { name, from, to });
 
         } catch (error) {
             console.log(error);
@@ -210,7 +228,6 @@ function markMoves(moves) {
             item.classList.add('is-move');
         }
     })
-
 }
 function markKills(moves) {
     const set = new Set(moves);
@@ -223,44 +240,109 @@ function markKills(moves) {
     })
 }
 
-export function botGo(globalBoard) {
-    const fen = fmtFEN(globalBoard, 'black');
-    engine.postMessage(`position fen ${fen}`);
-    engine.postMessage('go depth 10');
-    engine.onmessage = (e) => {
-        const line = typeof e.data === 'string' ? e.data : e;
-        if (line.startsWith('bestmove')) {
-            const move = line.split(' ')[1];
-            const parse = parseMove(move);
-            const { from, to } = parse;
-            curMove = to;
-
-            if (move == '(none)') {
-                showResult('lose');
-            }
-
-            setTimeout(() => {
-                moveS = fmtMove(globalBoard[from], from, to);
-                undoMoves.push({ move: from + to, capture: globalBoard[to] });
-                gListMove.push(moveS);
-                curMove = to;
-                globalBoard[to] = globalBoard[from];
-                globalBoard[from] = '.';
-                blackMove = curMove.toLowerCase();
-                const { m, k } = handleMove({ name: globalBoard[to] }, to, globalBoard);
-                let kill = k;
-
-                const check = kill.find(move => globalBoard[move].toLowerCase() == 'k')
-                if (check) {
-                    moveS += '+';
-                }
-                fillPieces('bot','white',1);
-                addMoveList(gListMove);
-            }, 1000); // 1000ms = 1
-
-        }
-    };
-    engine.onerror = (err) => {
-        console.error('[ENGINE ERROR]', err);
-    };
+function emit(name, data) {
+    eventsBus[name]?.forEach(fn => fn(data))
 }
+export function on(name, fn) {
+    (eventsBus[name] ||= []).push(fn);
+}
+function checkCastling(from) {
+    let cols = 'CDEFG';
+    let kingClone = globalBoard[from];
+    let backup = [];
+    for (let i = 0; i < cols.length; i++) {
+        backup.push(globalBoard[cols[i] + from[1]]);
+    }
+    for (let i = 0; i < cols.length; i++) {
+        globalBoard[cols[i] + from[1]] = kingClone;
+    }
+    let attackSquare = [];
+    for (const [pos, piece] of Object.entries(globalBoard)) {
+        if (piece == '.')
+            continue;
+        const { k } = handleMove(piece, pos);
+        attackSquare.push(...k);
+    }
+    for (let i = 0; i < 5; i++) {
+        globalBoard[cols[i] + from[1]] = backup[i];
+    }
+    let ans = [];
+    let isAttack = false;
+    for (let i = 0; i < 3; i++) {
+        if (i != 2 && globalBoard[cols[i] + from[1]] != '.') {
+            isAttack = true;
+            break;
+        }
+        isAttack = attackSquare.find(move => move == (cols[i] + from[1]));
+        if (isAttack)
+            break;
+    }
+    const posKing = from;
+    let posR = 'A' + from[1];
+    if (!isAttack && !isMove[posKing] && !isMove[posR]) ans.push('C' + from[1]);
+    isAttack = false;
+    for (let i = 2; i < 5; i++) {
+        if (i != 2 && globalBoard[cols[i] + from[1]] != '.') {
+            isAttack = true;
+            break;
+        }
+        isAttack = attackSquare.find(move => move == (cols[i] + from[1]));
+        if (isAttack)
+            break;
+    }
+    posR = 'H' + from[1];
+    if (!isAttack && !isMove[posKing] && !isMove[posR]) ans.push('G' + from[1]);
+    return ans;
+}
+function checkEnPassant(from) {
+    let ans = [];
+    const lastMove = getLastMove();
+    if(from[1]!='4'&&from[1]!='5')
+        return ans;
+    if(!lastMove)
+        return ans;
+    const { from: fromLastMove, piece,to } = lastMove;
+    if(Math.abs(parseInt(to[1])-parseInt(fromLastMove[1]))!=2){
+        return ans;
+    }
+    if (!lastMove)
+        return ans;
+    const fileLastmove = to[0].charCodeAt(0);
+    const file = from[0].charCodeAt(0);
+    const rankLastMove=to[1].charCodeAt(0);
+    const rank=from[1].charCodeAt(0);
+    console.log(file,fileLastmove);
+    if(rank!=rankLastMove)
+        return ans;
+    if (Math.abs(file - fileLastmove) == 1) {
+        if (piece == 'P')
+            ans.push(fromLastMove[0] + 3);
+        if (piece == 'p')
+            ans.push(fromLastMove[0] + 6);
+    }
+    return ans;
+}
+function showPromotion(name, from, to) {
+    curFrom = from;
+    curTo = to;
+    overplayPromotion.classList.add('show');
+    piecePromotion.forEach(btn => {
+        const piece = btn.dataset.piece;
+        const path = `/images/${name == 'P' ? 'w' : 'b'}${piece}.png`;
+        const img = btn.querySelector('img');
+        img.src = path;
+    })
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    boardEl = document.getElementById("board");
+    overplayPromotion = document.getElementById('overlay-promotion');
+    piecePromotion = document.querySelectorAll('.promotion-item');
+    piecePromotion.forEach(btn => btn.addEventListener('click', () => {
+        let piece = btn.dataset.piece;
+        piece = (name == 'P' ? piece : piece.toLowerCase());
+        emit('board-change', { name: piece, from: curFrom, to: curTo })
+        overplayPromotion.classList.remove('show');
+    }))
+})
+

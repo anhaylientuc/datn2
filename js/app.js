@@ -1,29 +1,24 @@
 
 
-import { BOARD } from "./constants/piece";
+import { update } from "firebase/database";
+import { BOARD,PIECES_AT } from "./constants/piece";
+import { handleMove } from "./move";
 export let boardEl = null;
 export let engine = null;
 export let botMove = '';
-let hasRenderedBoard = false; // 👈 flag chặn render nhiều lần
+export let globalBoard=null;
 async function renderBoard() {
     try {
-
         if (!boardEl)
             boardEl = document.getElementById('board');
-         // nếu đã render rồi thì thôi
-        if (hasRenderedBoard) return;
-        hasRenderedBoard = true;
-
-        // an toàn hơn: dọn sạch trước khi vẽ
-        boardEl.innerHTML = '';
         let cols = 'ABCDEFGH';
         for (let i = 8; i >= 1; i--) {
             for (let j = 0; j < 8; j++) {
                 const li = document.createElement('li');
                 li.className = 'square';
-                li.dataset.value = cols[j]+i;
-                li.dataset.rank=i;
-                li.dataset.file=cols[j];
+                li.dataset.value = cols[j] + i;
+                li.dataset.rank = i;
+                li.dataset.file = cols[j];
                 boardEl.appendChild(li);
             }
         }
@@ -32,31 +27,21 @@ async function renderBoard() {
         console.log(error);
     }
 }
-let isInited = false;
-
-function loadData() {
-    if (isInited) return;   // 👈 nếu đã init rồi thì không làm lại
-    isInited = true;
-
-    renderBoard();
-    if (!engine) {
-        createEngine();
-    }
-}
 function fillColorBoard() {
     const container = document.querySelectorAll('#board li')
     container.forEach((item, index) => {
         item.style.backgroundColor = (Math.floor(index / 8) + index) % 2 == 0 ? '#EEEED2' : '#769656';
     })
 }
-// function loadData() {
-//     renderBoard();
-//     createEngine();
-//     try {
-//     } catch (error) {
-//         console.log(error);
-//     }
-// }
+function loadData() {
+    renderBoard();
+    createBoard();
+    createEngine();
+    try {
+    } catch (error) {
+        console.log(error);
+    }
+}
 export function fmtBoard(fen) {
     const str = fen.split(' ');
     const rows = str[0].split('/');
@@ -84,7 +69,7 @@ export function fmtBoard(fen) {
     }
     return board;
 }
-export function fmtFEN(board, turn) {
+export function fmtFEN(board, turn,castlingFen,enpassantFen) {
     let fen = '';
     let cols = 'ABCDEFGH';
     for (let i = 8; i >= 1; i--) {
@@ -103,12 +88,12 @@ export function fmtFEN(board, turn) {
         }
         if (cnt)
             line += cnt;
-        if (i >1)
+        if (i > 1)
             line += '/';
         fen += line;
     }
 
-    return fen + ' b - - 0 1';
+    return fen + ` b ${castlingFen} ${enpassantFen} 0 1`;
 }
 export function printBoard(board) {
     let cols = 'ABCDEFGH';
@@ -138,7 +123,22 @@ export function createEngine() {
     engine.postMessage('isready');
     return engine;
 }
-document.addEventListener('DOMContentLoaded', loadData,{ once: true });
+export function createBoard() {
+    if(!globalBoard)
+        globalBoard={};
+    let cols = 'ABCDEFGH';
+    for (let i = 1; i <= 8; i++) {
+        for (let j = 0; j < 8; j++) {
+            const pos = cols[j] + (9 - i);
+            globalBoard[pos] = PIECES_AT[i - 1][j];
+        }
+    }
+}
+export function updateBoard(board)
+{
+    globalBoard=board
+}
+document.addEventListener('DOMContentLoaded', loadData);
 
 
 

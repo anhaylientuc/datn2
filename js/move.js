@@ -1,13 +1,15 @@
-let globalBoard = null;
+import { globalBoard } from "./app";
+import {  getCastlingMove, getEnPassantMove } from "./board";
+import { getLastMove } from "./room";
 let sideMap = null;
 let moves = null, kill = null;
 let piece = '', from = '';
-export function handleMove(_piece, _from, board) {
+export function handleMove(_piece, _from) {
     moves = [], kill = [];
-    globalBoard = board;
+    //globalBoard = board;
     sideMap = new Map();
+    piece = _piece;
     from = _from;
-
     sideMap.set('P', 'white');
     sideMap.set('R', 'white');
     sideMap.set('N', 'white');
@@ -23,8 +25,6 @@ export function handleMove(_piece, _from, board) {
     sideMap.set('k', 'black');
 
 
-    const { name } = _piece;
-    piece = name
     switch (piece) {
         case 'P':
         case 'p':
@@ -51,7 +51,7 @@ export function handleMove(_piece, _from, board) {
             handleKing();
             break;
         default:
-            console.log('Unknown piece:', name);
+            console.log('Unknown piece:', piece);
     }
     return { m: moves, k: kill };
 }
@@ -62,6 +62,7 @@ function canKill(from, to) {
 
     const p1 = globalBoard[from];
     const p2 = globalBoard[to];
+
     if (!sideMap.get(p2)) {
         return false;
     }
@@ -71,27 +72,6 @@ function canKill(from, to) {
 function isValid(to) {
     const res = (globalBoard[to] == '.');
     return res;
-}
-function markMoves(moves) {
-    const set = new Set(moves);
-    const sq = document.querySelectorAll('#board li');
-    sq.forEach(item => {
-        const pos = item.dataset.value;
-        if (set.has(pos)) {
-            item.classList.add('is-move');
-        }
-    })
-
-}
-function markKills(moves) {
-    const set = new Set(moves);
-    const sq = document.querySelectorAll('#board li');
-    sq.forEach(item => {
-        const pos = item.dataset.value;
-        if (set.has(pos)) {
-            item.classList.add('is-capture');
-        }
-    })
 }
 function movesP() {
     let steps = [-2, -1, 1, 2];
@@ -112,6 +92,9 @@ function movesP() {
             moves.push(newTo);
         }
     }
+    const move=getEnPassantMove();
+    if(move)
+        moves.push(...move);
 }
 
 function killsP() {
@@ -123,7 +106,8 @@ function killsP() {
     }
     if (canKill(from, kill_2)) {
         kill.push(kill_2);
-    } 
+    }
+    
 }
 function handlePawn() {
     movesP();
@@ -131,22 +115,22 @@ function handlePawn() {
 }
 function handleKnight() {
     let steps = [-2, -1, 1, 2];
-        for (let i of steps) {
-            for (let j of steps) {
-                if (Math.abs(i * j) != 2)
-                    continue;
-                const row = Number(from[1]) + j;
-                const newTo = fmt(from[0], i) + row;
-                if (isValid(newTo)) {
-                    moves.push(newTo);
-                    continue;
-                }
-                if (canKill(from, newTo)) {
-                    kill.push(newTo);
-                    break;
-                }
+    for (let i of steps) {
+        for (let j of steps) {
+            if (Math.abs(i * j) != 2)
+                continue;
+            const row = Number(from[1]) + j;
+            const newTo = fmt(from[0], i) + row;
+            if (isValid(newTo)) {
+                moves.push(newTo);
+                continue;
+            }
+            if (canKill(from, newTo)) {
+                kill.push(newTo);
+                break;
             }
         }
+    }
 }
 function handleRook() {
     let steps = [1, -1, 0];
@@ -187,13 +171,12 @@ function handleBishop() {
                 break;
             }
         }
-    }    
+    }
 }
 function handleQueen() {
     handleBishop();
     handleRook();
 }
-
 function handleKing() {
     let steps = [1, -1, 0];
     for (let i of steps) {
@@ -207,5 +190,6 @@ function handleKing() {
                 kill.push(newTo);
         }
     }
-
+    let res=getCastlingMove();
+    res.forEach(move=>moves.push(move));
 }

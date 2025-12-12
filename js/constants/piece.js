@@ -71,3 +71,11 @@ pieceMap.set('n','/images/bN.png')
 pieceMap.set('b','/images/bB.png');
 pieceMap.set('k','/images/bK.png');
 pieceMap.set('q','/images/bQ.png');
+
+export const isMove={};
+const cols='ABCDEFGH';
+for(let i=1;i<=8;i++){
+    for(let j=0;j<8;j++){
+        isMove[cols[j]+i]=false;
+    }
+}

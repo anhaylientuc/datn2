@@ -17,6 +17,8 @@ async function logout() {
 
         await update(ref(db), updates);
         await signOut(auth)
+        window.location.href = 'index.html'; // hoặc './index.html' tùy cấu trúc folder
+
 
     } catch (error) {
         console.log("Loi khi dang xuat: ", error);
@@ -27,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnGuest = document.getElementById('btn-guest');
     const nameEl = document.querySelector('#user-card .username');
     const avatarEl = document.querySelector('#user-card .ic img');
-
+    const btnLogout=document.getElementById('btn-logout-danger');
 
     getRedirectResult(auth)
         .then((res) => {
@@ -104,4 +106,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
     })
+    btnLogout.addEventListener('click',logout);
 })

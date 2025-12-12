@@ -2,106 +2,186 @@
 <html lang="en">
 
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="css/online.css" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/online.css" />
+  <title>FWF Chess – Play Online</title>
 </head>
 
 <body>
-    <!-- <h2>Play Online</h2> -->
-    <header class="header">
-        <h1 class="header__title">Play Online</h1>
-    </header>
-    <main class="wrap">
-        <!-- User card -->
-        <div class="card when-auth" id="user-card" role="region" aria-label="User information">
-            <div class="card__row">
-                <span class="ic">
-                    <img src="src/icons/user.png" />
-                </span>
-                <div class="stack">
-                    <div class="label">Logged in as:</div>
-                    <div class="value username">username</div>
-                </div>
-            </div>
+  <!-- Header: giống title bar của game -->
+  <header class="header">
+    <div class="header__left">
+      <div class="brand">
+        <div class="brand__mark">
+          <img src="/icons/strategy.png" alt="FWF" />
+        </div>
+        <div class="brand__text">
+          <div class="brand__title">FWF Chess</div>
+          <div class="brand__subtitle" id="queue-subtitle">
+            Online Matchmaking
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="header__right">
+      <!-- JS thêm / bỏ .is-finding -->
+      <span class="queue-indicator" id="queue-indicator">
+        <span class="dot"></span>
+        Ready to queue
+      </span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- User card -->
+    <section class="card card--user when-auth" id="user-card" role="region" aria-label="User information">
+      <div class="card__row">
+        <span class="ic">
+          <img src="src/icons/user.png" />
+        </span>
+        <div class="stack">
+          <div class="label">Logged in as</div>
+          <div class="value username">username</div>
+        </div>
+        <div class="pill pill--elo">
+          <span class="pill__label">ELO</span>
+          <span class="pill__value" id="user-elo">0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Matchmaking card -->
+    <section class="card card--mm when-auth" id="mm-card" role="region" aria-label="Matchmaking">
+      <div class="mm-header">
+        <div>
+          <div class="mm-title">Quick play</div>
+          <div class="mm-subtitle muted">
+            Find an opponent close to your rating in seconds.
+          </div>
         </div>
 
-        <!-- Matchmaking card -->
-        <div class="card when-auth" id="mm-card" role="region" aria-label="Matchmaking">
-            <div class="timer">
-                <span class="ic">
-                    <img src="src/icons/clock.png" />
-                </span>
-                <span class="time" id="time">00:00</span>
-            </div>
-            <div class="actions">
-                <button class="btn btn-primary" id="btn-find">
-                    <img class="ic16" src="src/icons/magnifying-glass.png" alt="" aria-hidden="true" />
-                    Find Game
-                </button>
-                <button class="btn btn-danger" id="btn-cancel">
-                    Cancel<span class="dotting" aria-hidden="true"></span>
-                </button>
-            </div>
+        <!-- Timer: JS thêm .is-finding vào .card--mm để show -->
+        <div class="mm-timer timer">
+          <span class="ic">
+            <img src="src/icons/clock.png" />
+          </span>
+          <span class="time" id="time">00:00</span>
+        </div>
+      </div>
+
+      <!-- Chọn mode -->
+      <div class="mm-modes">
+        <!-- Time control -->
+        <div class="mode-group">
+          <span class="mode-label muted small">Time control</span>
+          <div class="mode-chips" id="time-controls">
+            <button class="mode-chip is-active" data-time="3+2">Blitz</button>
+            <button class="mode-chip" data-time="10+0">Rapid</button>
+            <button class="mode-chip" data-time="30+0">Classical</button>
+          </div>
         </div>
 
-        <!-- Status card (ẩn mặc định; bật class .show bằng JS khi tìm thấy đối thủ) -->
-        <div class="card card--status when-auth" id="status-card" role="status" aria-live="polite">
-            <div class="status">
-                <div class="status__line">Opponent found!</div>
-                <div class="status__line">
-                    Connecting to room<span class="dotting" aria-hidden="true"></span>
-                </div>
-            </div>
+        <!-- Rated / Casual -->
+        <div class="mode-group">
+          <span class="mode-label muted small">Game type</span>
+          <div class="mode-toggle" id="mode-rated" data-rated="true">
+            <button class="mode-toggle__pill is-active" data-rated="true">Rated</button>
+            <button class="mode-toggle__pill" data-rated="false">Casual</button>
+          </div>
+          <div class="mode-hint muted tiny">
+            Rated games affect your ELO.
+          </div>
         </div>
-        <!-- Guest card (HIỆN mặc định) -->
+      </div>
 
-        
+      <!-- Buttons -->
+      <div class="mm-actions">
+        <button class="btn btn-primary" id="btn-find">
+          <img class="ic16" src="src/icons/magnifying-glass.png" alt="" aria-hidden="true" />
+          Play now
+        </button>
+        <button class="btn btn-text-cancel" id="btn-cancel">
+          Cancel<span class="dotting" aria-hidden="true"></span>
+        </button>
+      </div>
 
-        <div id="opponent-overplay"></div>
-        <div class="card card--matchfound when-auth" id="opponent-card" role="region" aria-label="Opponent found">
-            <div class="row header-row">
-                <span class="badge">MATCH FOUND</span>
-                <div class="muted">Room is preparing<span class="dotting" aria-hidden="true"></span></div>
-            </div>
-            <div class="vs">
-                <div class="player you" aria-label="You">
-                    <div class="avatar">
-                        <img id="you-avatar" src="src/icons/user.png" alt="Your avatar" />
-                    </div>
-                    <div class="meta">
-                        <div class="name" id="you-name">You</div>
-                        <div class="elo" id="you-elo">ELO:</div>
-                    </div>
-                </div>
-                <div class="vs-center">
-                    <div class="vs-text">VS</div>
-                    <div class="muted small" id="match-conn">Connecting<span class="dotting" aria-hidden="true"></span>
-                    </div>
-                </div>
-                <div class="player opp" aria-label="Opponent">
-                    <div class="avatar">
-                        <img id="opp-avatar" src="src/icons/user.png" alt="Opponent avatar" />
-                    </div>
-                    <div class="meta">
-                        <div class="name" id="opp-name">Opponent</div>
-                        <div class="elo" id="opp-elo">ELO:</div>
-                    </div>
-                </div>
-            </div>
-            <div class="actions footer-actions">
-                <button class="btn btn-danger" id="btn-cancel-found">Cancel</button>
-                <button class="btn btn-primary" id="btn-join-found">Go to room</button>
-            </div>
+      <div class="mm-footer muted small">
+        <span id="mm-mode-summary">Blitz&nbsp;3+2 · Rated</span>
+        <br />
+        You may experience slightly longer queues at off-peak hours.
+      </div>
+    </section>
+
+    <!-- Status card (Connecting…) – chỉ để báo trạng thái -->
+    <section class="card card--status when-auth" id="status-card" role="status" aria-live="polite">
+      <div class="status">
+        <div class="status__line">
+          <span class="status-dot"></span>
+          Searching for players<span class="dotting" aria-hidden="true"></span>
         </div>
-    </main>
-    <script type="module" src="js/auth.js"></script>
-    <script type="module" src="js/online.js"></script>
+        <div class="status__line muted small">
+          Tip: Don’t close this tab while we’re matchmaking.
+        </div>
+      </div>
+    </section>
 
+    <!-- Overlay bg cho match found -->
+    <div id="opponent-overplay"></div>
 
-</body>
-<footer class="tip">
+    <!-- MATCH FOUND panel -->
+    <section class="card card--matchfound when-auth" id="opponent-card" role="region" aria-label="Opponent found">
+      <div class="row header-row">
+        <span class="badge">MATCH FOUND</span>
+        <div class="muted small">
+          Room is preparing<span class="dotting" aria-hidden="true"></span>
+        </div>
+      </div>
+
+      <div class="vs">
+        <!-- YOU -->
+        <div class="player you" aria-label="You">
+          <div class="avatar">
+            <img id="you-avatar" src="src/icons/user.png" alt="Your avatar" />
+          </div>
+          <div class="meta">
+            <div class="name" id="you-name">You</div>
+            <div class="elo" id="you-elo">ELO: — — —</div>
+          </div>
+        </div>
+
+        <div class="vs-center">
+          <div class="vs-text">VS</div>
+          <div class="muted small" id="match-conn">
+            Connecting to room<span class="dotting" aria-hidden="true"></span>
+          </div>
+        </div>
+
+        <!-- OPPONENT -->
+        <div class="player opp" aria-label="Opponent">
+          <div class="avatar">
+            <img id="opp-avatar" src="src/icons/user.png" alt="Opponent avatar" />
+          </div>
+          <div class="meta">
+            <div class="name" id="opp-name">Opponent</div>
+            <div class="elo" id="opp-elo">ELO: — — —</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions footer-actions">
+        <button class="btn btn-danger" id="btn-cancel-found">Cancel</button>
+        <button class="btn btn-primary" id="btn-join-found">Go to room</button>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="js/auth.js"></script>
+  <script type="module" src="js/online.js"></script>
+
+  <footer class="tip">
     Tip: Stay signed in to track your ELO.
-</footer>
+  </footer>
+</body>
 
 </html>
