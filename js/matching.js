@@ -36,35 +36,7 @@ export async function findGame({ db, auth }) {
         window.removeEventListener('beforeunload', cleanup);
         window.removeEventListener('pagehide', cleanup);
     }
-    // --- lắng nghe khi có matchId, nhớ giữ off() để gỡ ---
 
-    // offMatch = onValue(matchIdRef, async (snap) => {
-    //     const v = snap.val();
-    //     if (v == null) return;
-
-    //     await teardown();
-
-    //     alert('[MATCHED] ' + v);
-
-    //     const matchRef = ref(db, `matches/${v}`);
-    //     const matchSnap = await get(matchRef);
-    //     const { a, b } = matchSnap.val();
-    //     const updates = {
-    //         [`users/${a}/side`]: 'white',
-    //         [`users/${b}/side`]: 'black',
-
-    //     }
-    //     await update(ref(db), updates);
-    //     const sideA = (await get(ref(db, `users/${a}`))).val();
-    //     const sideB = (await get(ref(db, `users/${b}`))).val();
-    //     const url = new URL('room.html', window.location.origin);
-    //     url.searchParams.set('room', String(v));
-    //     window.location.href = url.href;
-    //     console.log(sideA,sideB);
-
-
-    // })
-    // vào hàng chờ
     await set(entryRef, { ts: Date.now(), claimedBy: null });
     const getCandidatesQ = query(entriesRef, limitToFirst(5));
     const listSnap = await get(getCandidatesQ);
@@ -115,12 +87,11 @@ export async function findGame({ db, auth }) {
                 createAt: serverTimestamp(),
                 board,
                 turn: 'white',
-                lastMove: { from: '', to: '' },
                 a: bit?uid:oppUid,
                 b: bit?oppUid:uid,
                 winner:'none',
-                timeW:600,
-                timeB:600,
+                timeW:60,
+                timeB:60,
             }
         };
 

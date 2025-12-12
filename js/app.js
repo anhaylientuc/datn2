@@ -1,6 +1,8 @@
 
 
+import { update } from "firebase/database";
 import { BOARD,PIECES_AT } from "./constants/piece";
+import { handleMove } from "./move";
 export let boardEl = null;
 export let engine = null;
 export let botMove = '';
@@ -67,7 +69,7 @@ export function fmtBoard(fen) {
     }
     return board;
 }
-export function fmtFEN(board, turn) {
+export function fmtFEN(board, turn,castlingFen,enpassantFen) {
     let fen = '';
     let cols = 'ABCDEFGH';
     for (let i = 8; i >= 1; i--) {
@@ -91,7 +93,7 @@ export function fmtFEN(board, turn) {
         fen += line;
     }
 
-    return fen + ' b - - 0 1';
+    return fen + ` b ${castlingFen} ${enpassantFen} 0 1`;
 }
 export function printBoard(board) {
     let cols = 'ABCDEFGH';
@@ -131,6 +133,10 @@ export function createBoard() {
             globalBoard[pos] = PIECES_AT[i - 1][j];
         }
     }
+}
+export function updateBoard(board)
+{
+    globalBoard=board
 }
 document.addEventListener('DOMContentLoaded', loadData);
 

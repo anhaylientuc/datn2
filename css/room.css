@@ -69,7 +69,7 @@ body {
   opacity: 0.22;
 }
 
-.card > * {
+.card>* {
   position: relative;
 }
 
@@ -386,6 +386,9 @@ body {
 /* board frame */
 
 .board-frame {
+  position: relative;
+  /* quan trọng */
+
   padding: 8px;
   border-radius: 16px;
   border: 1px solid rgba(30, 64, 175, 0.6);
@@ -407,6 +410,12 @@ body {
   -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent;
   margin: 0 auto;
+  position: relative;
+}
+
+.board.locked {
+  pointer-events: none;
+  opacity: 0.6;
 }
 
 /* Squares */
@@ -511,6 +520,28 @@ body {
   box-shadow: inset 0 0 0 5px rgba(250, 204, 21, 0.75);
 }
 
+.square.is-check {
+  background: radial-gradient(circle, rgba(248, 113, 113, 0.45), transparent 70%);
+  box-shadow: inset 0 0 0 3px rgba(248, 113, 113, 0.9);
+  animation: check-pulse 1s ease-in-out infinite;
+}
+
+/* hiệu ứng nhấp nháy nhẹ giống room.css */
+@keyframes check-pulse {
+  0% {
+    box-shadow: inset 0 0 0 3px rgba(248, 113, 113, 0.9);
+  }
+
+  50% {
+    box-shadow: inset 0 0 0 5px rgba(248, 113, 113, 0.3);
+  }
+
+  100% {
+    box-shadow: inset 0 0 0 3px rgba(248, 113, 113, 0.9);
+  }
+}
+
+
 /* ===== Actions ===== */
 
 .actions-row {
@@ -609,31 +640,103 @@ body {
 /* ===== Overlay result ===== */
 
 .overlay-result {
-  position: fixed;
-  inset: 0;
+  position: absolute;
+  inset: 8px;
+  /* khớp padding board-frame, hoặc inset:0 nếu muốn phủ luôn viền */
   display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: rgba(15, 23, 42, 0.85);
-  z-index: 100;
+  place-items: center;
+  /* center card trong board */
+  background: rgba(15, 23, 42, 0.78);
+  border-radius: 16px;
+  z-index: 50;
 }
 
 .overlay-result.show {
-  display: flex;
+  display: grid;
 }
 
 .overlay-result__card {
   background: radial-gradient(circle at top, #0b1120, #020617);
   color: var(--fg);
-  padding: 20px 24px;
+  padding: 20px 24px 18px;
   border-radius: 16px;
   box-shadow: var(--shadow);
   min-width: 260px;
   max-width: 360px;
   text-align: center;
-  border: 1px solid rgba(56, 189, 248, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.7);
 }
+
+/* Icon kết quả */
+
+.overlay-result__icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay-result__icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.55));
+}
+
+/* Badge trạng thái (Victory / Defeat / Draw) */
+
+.overlay-result__badge {
+  display: inline-block;
+  margin-bottom: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: rgba(148, 163, 184, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  color: var(--muted);
+}
+
+/* Biến thể theo trạng thái */
+
+.overlay-result--win .overlay-result__card {
+  border-color: rgba(34, 197, 94, 0.9);
+  box-shadow: 0 18px 40px rgba(22, 163, 74, 0.55);
+}
+
+.overlay-result--win .overlay-result__badge {
+  background: rgba(22, 163, 74, 0.18);
+  border-color: rgba(34, 197, 94, 0.95);
+  color: #bbf7d0;
+}
+
+.overlay-result--lose .overlay-result__card {
+  border-color: rgba(239, 68, 68, 0.9);
+  box-shadow: 0 18px 40px rgba(239, 68, 68, 0.55);
+}
+
+.overlay-result--lose .overlay-result__badge {
+  background: rgba(248, 113, 113, 0.18);
+  border-color: rgba(239, 68, 68, 0.95);
+  color: #fecaca;
+}
+
+.overlay-result--draw .overlay-result__card {
+  border-color: rgba(234, 179, 8, 0.95);
+  box-shadow: 0 18px 40px rgba(234, 179, 8, 0.5);
+}
+
+.overlay-result--draw .overlay-result__badge {
+  background: rgba(250, 204, 21, 0.18);
+  border-color: rgba(234, 179, 8, 0.95);
+  color: #fef3c7;
+}
+
+/* tiêu đề, mô tả, summary */
 
 .overlay-result__title {
   font-size: 20px;
@@ -642,16 +745,162 @@ body {
 }
 
 .overlay-result__subtitle {
-  margin: 0 0 16px;
+  margin: 0 0 8px;
   font-size: 14px;
   opacity: 0.9;
+}
+
+.overlay-result__summary {
+  margin: 0 0 14px;
+  font-size: 12px;
+  color: var(--muted);
 }
 
 .overlay-result__footer {
   display: flex;
   justify-content: center;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 4px;
+}
+
+/* hiệu ứng icon khi thắng (nhẹ) */
+
+.overlay-result--win .overlay-result__icon img {
+  animation: result-bounce 1.1s ease-in-out infinite;
+}
+
+@keyframes result-bounce {
+  0% {
+    transform: scale(1) translateY(0);
+  }
+
+  50% {
+    transform: scale(1.06) translateY(-2px);
+  }
+
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ===== Overlay promotion (pawn promotion) ===== */
+
+.overlay-promotion {
+  position: absolute;
+  inset: 8px;
+  /* khớp padding board-frame */
+  display: none;
+  place-items: center;
+  /* center card */
+  background: rgba(15, 23, 42, 0.88);
+  border-radius: 16px;
+  z-index: 60;
+  /* cao hơn highlight */
+}
+
+.overlay-promotion.show {
+  display: grid;
+}
+
+.overlay-promotion__card {
+  background: radial-gradient(circle at top, #0b1120, #020617);
+  color: var(--fg);
+  padding: 18px 20px 16px;
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  min-width: 260px;
+  max-width: 360px;
+  text-align: center;
+  border: 1px solid rgba(56, 189, 248, 0.75);
+}
+
+.overlay-promotion__title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.overlay-promotion__subtitle {
+  margin: 0 0 14px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+/* grid chứa 4 quân để chọn */
+
+.promotion-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.promotion-item {
+  appearance: none;
+  border: 0;
+  padding: 6px 4px 4px;
+  border-radius: 12px;
+  background: radial-gradient(circle at top, #020617, #020617 70%);
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  cursor: pointer;
+  color: var(--fg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: transform .08s ease, box-shadow .08s ease, border-color .08s ease, background .08s ease;
+}
+
+.promotion-item:hover {
+  border-color: rgba(56, 189, 248, 0.85);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.7);
+  background: radial-gradient(circle at top, rgba(15, 23, 42, 0.98), #020617);
+  transform: translateY(-1px);
+}
+
+.promotion-item:active {
+  transform: translateY(0);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.9);
+}
+
+/* ô chứa icon quân */
+
+.promotion-piece {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #e5e7eb;
+  /* nền sáng cho quân đen dễ thấy */
+  border: 1px solid #9ca3af;
+  /* viền xám nhẹ */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.promotion-piece img {
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* chữ dưới icon */
+
+.promotion-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+}
+
+/* footer của overlay */
+
+.overlay-promotion__footer {
+  margin-top: 4px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
 }
 
 /* ===== Small screens ===== */
@@ -672,12 +921,24 @@ body {
   }
 
   .actions-row {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
   }
 
-  .actions-left,
+  /* đảm bảo trái - phải đúng vị trí */
+  .actions-left {
+    justify-content: flex-start;
+  }
+
   .actions-right {
-    justify-content: space-between;
+    justify-content: flex-end;
+  }
+
+  /* nếu muốn 2 nút không bị xuống dòng, giới hạn kích thước */
+  .actions-left .btn,
+  .actions-right .btn {
+    white-space: nowrap;
   }
 }

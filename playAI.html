@@ -14,7 +14,7 @@
     <div class="header-left">
       <div class="brand">
         <div class="brand-mark">
-          <img src="src/icons/knight.png" alt="FWF" />
+          <img src="/icons/strategy.png" alt="FWF" />
         </div>
         <div class="brand-text">
           <div class="brand-title">FWF Chess</div>
@@ -134,20 +134,71 @@
     </section>
   </main>
 
-  <!-- Overlay kết quả -->
-  <div class="overlay-result" id="overlay-result" aria-modal="true" role="dialog">
+
+  <div class="overlay-result overlay-result--win" id="overlay-result" role="dialog" aria-live="polite"
+    aria-modal="true">
     <div class="overlay-result__card">
+
+      <div class="overlay-result__icon">
+        <img id="result-icon" src="src/icons/icon-win.png" alt="Result Icon">
+      </div>
+
+      <div class="overlay-result__badge" id="result-badge">Victory</div>
       <div class="overlay-result__title" id="result-title">You win!</div>
-      <p class="overlay-result__subtitle" id="result-subtitle">
-        Checkmate. Nice game!
-      </p>
+      <p class="overlay-result__subtitle" id="result-subtitle"></p>
+
       <div class="overlay-result__footer">
         <button class="btn ghost" id="btn-close-result">Back</button>
-        <button class="btn primary" id="btn-new-game">New game</button>
       </div>
     </div>
   </div>
+   <!-- OVERLAY PHONG CẤP -->
+    <div class="overlay-promotion" id="overlay-promotion" role="dialog" aria-modal="true" aria-live="polite">
+      <div class="overlay-promotion__card">
+        <div class="overlay-promotion__title">Promote pawn</div>
+        <p class="overlay-promotion__subtitle">
+          Choose a piece to promote your pawn.
+        </p>
 
+        <div class="promotion-grid" aria-label="Promotion choices">
+          <!-- Queen -->
+          <button class="promotion-item" data-piece="Q">
+            <div class="promotion-piece">
+              <img src="src/pieces/wQ.png" alt="Queen" />
+            </div>
+            <span class="promotion-label">Queen</span>
+          </button>
+
+          <!-- Rook -->
+          <button class="promotion-item" data-piece="R">
+            <div class="promotion-piece">
+              <img src="src/pieces/wR.png" alt="Rook" />
+            </div>
+            <span class="promotion-label">Rook</span>
+          </button>
+
+          <!-- Bishop -->
+          <button class="promotion-item" data-piece="B">
+            <div class="promotion-piece">
+              <img src="src/pieces/wB.png" alt="Bishop" />
+            </div>
+            <span class="promotion-label">Bishop</span>
+          </button>
+
+          <!-- Knight -->
+          <button class="promotion-item" data-piece="N">
+            <div class="promotion-piece">
+              <img src="src/pieces/wN.png" alt="Knight" />
+            </div>
+            <span class="promotion-label">Knight</span>
+          </button>
+        </div>
+
+        <div class="overlay-promotion__footer">
+          <button class="btn ghost" id="btn-promotion-cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
   <script type="module" src="js/playAI.js"></script>
   <script type="module" src="js/board.js"></script>
 </body>
