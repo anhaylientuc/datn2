@@ -90,8 +90,8 @@ export async function findGame({ db, auth }) {
                 a: bit?uid:oppUid,
                 b: bit?oppUid:uid,
                 winner:'none',
-                timeW:60,
-                timeB:60,
+                timeW:600,
+                timeB:600,
             }
         };
 
