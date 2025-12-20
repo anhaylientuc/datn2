@@ -1,6 +1,5 @@
 import { globalBoard } from "./app";
 import {  getCastlingMove, getEnPassantMove } from "./board";
-import { getLastMove } from "./room";
 let sideMap = null;
 let moves = null, kill = null;
 let piece = '', from = '';

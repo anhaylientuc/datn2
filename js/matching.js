@@ -5,7 +5,7 @@ import {
     serverTimestamp,
 } from "firebase/database";
 import { BOARD, PIECES_AT } from "./constants/piece";
-import { printBoard } from "./app";
+import { fmtFEN, globalBoard, printBoard } from "./app";
 let offMatch = null;
 
 export async function findGame({ db, auth }) {
@@ -92,6 +92,9 @@ export async function findGame({ db, auth }) {
                 winner:'none',
                 timeW:600,
                 timeB:600,
+                "history":[
+                    {fenAfter:fmtFEN(globalBoard,'white','KQkq','-')}
+                ]
             }
         };
 

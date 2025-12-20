@@ -187,20 +187,92 @@
         <div class="moves-header">
           <div>
             <div class="moves-title">Move list</div>
-            <div class="moves-subtitle muted">
-              Synced in real time for both players.
+            <div class="moves-subtitle muted">Synced in real time for both players.</div>
+          </div>
+
+          <div class="moves-tools">
+            <button class="btn ghost btn-mini" id="btn-replay-first" title="First">⏮</button>
+            <button class="btn ghost btn-mini" id="btn-replay-prev" title="Prev">⏪</button>
+            <button class="btn ghost btn-mini" id="btn-replay-next" title="Next">⏩</button>
+            <button class="btn ghost btn-mini" id="btn-replay-last" title="Last">⏭</button>
+          </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="review-card" id="review-card">
+          <div class="review-top">
+            <div class="review-title">Move review</div>
+            <div class="review-acc">
+              <span class="muted">Accuracy</span>
+              <strong id="acc-value">--%</strong>
+            </div>
+          </div>
+
+          <div class="review-grid">
+            <div class="chip best"><span>⭐</span><b id="c-best">0</b><i>Best</i></div>
+            <div class="chip good"><span>✔️</span><b id="c-good">0</b><i>Good</i></div>
+            <div class="chip inacc"><span>⚠️</span><b id="c-inacc">0</b><i>Inacc</i></div>
+            <div class="chip mistake"><span>❓</span><b id="c-mistake">0</b><i>Mistake</i></div>
+            <div class="chip blunder"><span>💀</span><b id="c-blunder">0</b><i>Blunder</i></div>
+          </div>
+
+          <!-- MOVE DETAIL (click 1 move sẽ show ở đây) -->
+          <div class="move-detail" id="move-detail">
+            <div class="move-detail__top">
+              <div class="move-detail__title">
+                <span class="md-q" id="md-q">⭐</span>
+                <strong id="md-move">12... Qh5</strong>
+                <span class="md-tag" id="md-tag">Best</span>
+              </div>
+
+              <div class="move-detail__eval">
+                <span class="muted">Eval</span>
+                <strong id="md-eval">+0.6</strong>
+                <span class="md-delta" id="md-delta">(+0.1)</span>
+              </div>
+            </div>
+
+            <div class="move-detail__row">
+              <div class="move-detail__item">
+                <span class="muted">Best move</span>
+                <strong id="md-best">...Qg5</strong>
+              </div>
+              <div class="move-detail__item">
+                <span class="muted">Line</span>
+                <strong id="md-line">--</strong>
+              </div>
+            </div>
+
+            <div class="move-detail__actions">
+              <button class="btn ghost btn-mini" id="btn-show-line">Show line</button>
+              <button class="btn ghost btn-mini" id="btn-retry">Retry from here</button>
             </div>
           </div>
         </div>
 
-        <div class="moves" id="moves">
-          <ul></ul>
+        <!-- MOVE TABLE -->
+        <div class="moves-table-wrap" id="moves">
+          <table class="moves-table" aria-label="Move list">
+            <thead>
+              <tr>
+                <th class="col-no">#</th>
+                <th>White</th>
+                <th>Black</th>
+              </tr>
+            </thead>
+            <tbody id="moves-body"></tbody>
+          </table>
+        </div>
+
+        <div class="moves-hint muted">
+          Tip: Click a move to jump/replay.
         </div>
       </div>
+
     </aside>
   </main>
 
-  <script type="module" src="/js/room.js"></script>
+  <script type="module" src="/js/room/room.js"></script>
 </body>
 
 </html>

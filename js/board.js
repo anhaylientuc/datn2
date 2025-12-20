@@ -2,7 +2,7 @@
 import { pieceMap, isMove } from "./constants/piece";
 import { handleMove } from "./move";
 import { printBoard, globalBoard } from "./app";
-import { getLastMove } from "./room";
+import { getLastMove } from "./room/room";
 let activePiece = null;
 let startLeft = 0, startTop = 0;
 let startClientX = 0, startClientY = 0;
@@ -115,6 +115,7 @@ function ensureDelegationBound() {
         moves = m;
         kill = k;
         markMoves(m);
+        
         markKills(k);
         activePiece.style.zIndex = 10;
         activePiece.style.cursor = 'grabbing';
@@ -122,7 +123,7 @@ function ensureDelegationBound() {
         startClientX = e.clientX;
         startClientY = e.clientY;
 
-      
+
         const rect = activePiece.getBoundingClientRect();
         const boardRect = boardEl.getBoundingClientRect();
         const w = rect.width;
@@ -188,15 +189,18 @@ function ensureDelegationBound() {
             const checked = globalBoard[to].toUpperCase() == 'K' ? 1 : 0;
             curMove = to;
             isMove[from] = true;
+            let special = false;
             if ((name == 'K' || name == 'k')) {
                 const delta = to[0].charCodeAt(0) - from[0].charCodeAt(0);
                 if (delta == -2) {
                     globalBoard['D' + from[1]] = globalBoard['A' + from[1]];
                     globalBoard['A' + from[1]] = '.';
+                    special = 'castle'
                 }
                 if (delta == 2) {
                     globalBoard['F' + from[1]] = globalBoard['H' + from[1]];
                     globalBoard['H' + from[1]] = '.';
+                    special = 'castle'
                 }
             }
 
@@ -205,15 +209,18 @@ function ensureDelegationBound() {
                 return;
             }
             if ((name == 'P' || name == 'p') && enPassantMove) {
-                if (name == 'P')
+                if (name == 'P') {
                     globalBoard[to[0] + (parseInt(to[1]) - 1)] = '.';
-                if (name == 'p')
+                    special = 'enpassant';
+                }
+                if (name == 'p') {
                     globalBoard[to[0] + (parseInt(to[1]) + 1)] = '.';
-                enPassantMove=null
+                    special = 'enpassant';
+
+                }
+                enPassantMove = null
             }
-
-            emit('board-change', { name, from, to });
-
+            emit('board-change', { name, from, to, special });
         } catch (error) {
             console.log(error);
         }
@@ -297,22 +304,21 @@ function checkCastling(from) {
 function checkEnPassant(from) {
     let ans = [];
     const lastMove = getLastMove();
-    if(from[1]!='4'&&from[1]!='5')
+    if (from[1] != '4' && from[1] != '5')
         return ans;
-    if(!lastMove)
+    if (!lastMove)
         return ans;
-    const { from: fromLastMove, piece,to } = lastMove;
-    if(Math.abs(parseInt(to[1])-parseInt(fromLastMove[1]))!=2){
+    const { from: fromLastMove, piece, to } = lastMove;
+    if (Math.abs(parseInt(to[1]) - parseInt(fromLastMove[1])) != 2) {
         return ans;
     }
     if (!lastMove)
         return ans;
     const fileLastmove = to[0].charCodeAt(0);
     const file = from[0].charCodeAt(0);
-    const rankLastMove=to[1].charCodeAt(0);
-    const rank=from[1].charCodeAt(0);
-    console.log(file,fileLastmove);
-    if(rank!=rankLastMove)
+    const rankLastMove = to[1].charCodeAt(0);
+    const rank = from[1].charCodeAt(0);
+    if (rank != rankLastMove)
         return ans;
     if (Math.abs(file - fileLastmove) == 1) {
         if (piece == 'P')
@@ -341,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
     piecePromotion.forEach(btn => btn.addEventListener('click', () => {
         let piece = btn.dataset.piece;
         piece = (name == 'P' ? piece : piece.toLowerCase());
-        emit('board-change', { name: piece, from: curFrom, to: curTo })
+        emit('board-change', { name: piece, from: curFrom, to: curTo,special:'promotion' })
         overplayPromotion.classList.remove('show');
     }))
 })

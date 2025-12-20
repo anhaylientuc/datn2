@@ -97,7 +97,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (v == null) return;
         await teardown();
         matchId=v;
-        alert('[MATCHED] ' + v);
 
         const matchRef = ref(db, `matches/${v}`);
         const matchSnap = await get(matchRef);
