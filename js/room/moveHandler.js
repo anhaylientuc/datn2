@@ -23,31 +23,35 @@ export function attachBoardChangeHandler() {
         globalBoard[from] = '.';
         globalBoard[to] = name;
         fillPieces(S.turn, S.side);
-
+        highlightCheck();
+        console.log(S.check);
         //then check
-        const sideCheck = highlightCheck();
-        if (sideCheck) {
-            if (S.side == sideCheck || sideCheck == 'invalid') {
+        if (S.check) {
+       
+
+            const { side, posKing, posCheck } = S.check;
+            console.log(S.side,side);
+            if (S.side == side) {
                 //roll back
                 globalBoard[from] = name;
                 globalBoard[to] = capture;
-                fillPieces(turn, side);
+                fillPieces(S.turn, S.side);
                 highlightCheck();
                 return;
             }
             else {
-                highlightCheck();
-                if (isSafe(to)&&canCheckMate()) {
+                if (canCheckMate()) {
                     res += '#';
                     winner = S.uid;
                 }
                 else {
                     res += '+';
                 }
-
+                //highlightCheck();
             }
+
         }
-        const oppTurn=S.turn=='white'?'black':'white';
+        const oppTurn = S.turn == 'white' ? 'black' : 'white';
         const fenAfter = fmtFEN(globalBoard, oppTurn, castleFen, enpassantFen);
         S.lastFen = fenAfter;
         S.History.push({
@@ -58,7 +62,7 @@ export function attachBoardChangeHandler() {
             capture,
             fenBefore,
             fenAfter,
-            sideJustMoved:S.side
+            sideJustMoved: S.side
         })
 
         await update(S.matchRef, {
@@ -69,20 +73,8 @@ export function attachBoardChangeHandler() {
             timeW: S.gTimeW,
             timeB: S.gTimeB,
             history: S.History,
+            check: S.check
         });
 
     })
-}
-function isSafe(to)
-{
-    let isSafe=true;
-    for(const [pos,piece] of Object.entries(globalBoard)){
-        const {k}=handleMove(piece,pos);
-        const res=k.find(move=>move==to)
-        if(!res){
-            isSafe=false;
-            break;
-        }
-    }
-    return isSafe
 }

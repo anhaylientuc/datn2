@@ -29,7 +29,8 @@ export const S = {
   cGood:0,
   cInAcc:0,
   cMistake:0,
-  cBlunder:0
+  cBlunder:0,
 
+  check:null
 
 };

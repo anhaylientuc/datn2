@@ -119,15 +119,19 @@ function handleKnight() {
             if (Math.abs(i * j) != 2)
                 continue;
             const row = Number(from[1]) + j;
+           
             const newTo = fmt(from[0], i) + row;
+            
+           
+            if (canKill(from, newTo)) {
+                kill.push(newTo);
+                continue;
+            }
             if (isValid(newTo)) {
                 moves.push(newTo);
                 continue;
             }
-            if (canKill(from, newTo)) {
-                kill.push(newTo);
-                break;
-            }
+            
         }
     }
 }

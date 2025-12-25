@@ -107,7 +107,7 @@ function ensureDelegationBound() {
             const res = checkCastling(from);
             setCastlingMove(res);
         }
-        if ((name == 'P' || name == 'p') && (from[1] == '4' || from[1] == '5')) {
+        if ((name == 'P'&&from[1] == '5') ||( name == 'p' && from[1] == '4'  )) {
             const ans = checkEnPassant(from);
             setEnPassantMove(ans);
         }
@@ -218,8 +218,9 @@ function ensureDelegationBound() {
                     special = 'enpassant';
 
                 }
-                enPassantMove = null
             }
+            enPassantMove = null
+
             emit('board-change', { name, from, to, special });
         } catch (error) {
             console.log(error);

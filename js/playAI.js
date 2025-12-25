@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (pos) {
             const king=globalBoard[pos];
             const isWhite=king==king.toUpperCase()?'white':'black';
-            if(isWhite){
+            if(isWhite=='white'){
                 //roll back
                 globalBoard[from]=name;
                 globalBoard[to]=capture;

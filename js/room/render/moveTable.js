@@ -16,6 +16,7 @@ export function renderMoveCell(mode, m, i) {
         //         delta = (Number.isFinite(bestPlayEval.value) && Number.isFinite(normalPlayEval.value)) ? 
         //     (normalize(Number(bestPlayEval.value), sideJustMoved) - normalize(Number(normalPlayEval.value), sideJustMoved)) : null;
         tag = S.History[i]['tag'];
+        delta = S.History[i]['delta'];
     }
 
     //const tag = classifyMove(delta);
@@ -34,11 +35,13 @@ export function renderMoveCell(mode, m, i) {
     `
 }
 export function fmtCp(cp) {
-    const v = cp / 100;
-    return (v > 0 ? '+' : '') + v.toFixed(2);
+    if (Number.isFinite(cp)) {
+        const v = cp / 100;
+        return (v > 0 ? '+' : '') + v.toFixed(2);
+    }
+    return cp;
 }
 export function renderMovesBody(mode, l) {
-    console.log(S.History);
     const movesBody = document.getElementById('moves-body');
 
     movesBody.innerHTML = '';
@@ -88,7 +91,6 @@ export function renderMovesBody(mode, l) {
     }
 
 
-    //console.log(S.cBest,S.cGood,S.cInAcc,S.cMistake,S.cBlunder);
     document.getElementById('c-best').innerText = S.cBest;
     document.getElementById('c-good').innerText = S.cGood;
     document.getElementById('c-inacc').innerText = S.cInAcc;

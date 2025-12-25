@@ -6,7 +6,7 @@ import { fillPieces } from "../board";
 import { highlightCheck } from "./rules/check";
 import { showResult } from "./ui/resultOverlay";
 import { renderMovesBody } from "./render/moveTable";
-import { clearTimers,startTimersFromSnapshot } from "./ui/timers";
+import { clearTimers, startTimersFromSnapshot } from "./ui/timers";
 import { lockBoard } from "./boardLock";
 import { enterReplayMode } from "./replay/mode";
 export function attachMatchListener(matchRef) {
@@ -16,15 +16,18 @@ export function attachMatchListener(matchRef) {
             alert('Opponent left room');
             return;
         }
-        let { board, turn: turnSnap, winner, timeW, timeB, listMoves, msg, lastMove: lastMoveSnap, a, b, history } = snap.val();
+        let { board, turn: turnSnap, winner, timeW, timeB, listMoves, msg, lastMove: lastMoveSnap, a, b, history, check } = snap.val();
+
         S.History = history;
-        renderMovesBody('online',S.History.length);
+        renderMovesBody('online', S.History.length);
         S.lastMove = lastMoveSnap;
         S.You = a;
         S.Opp = b;
         S.turn = turnSnap;
+        S.check = check
         updateBoard(board);
         fillPieces(S.turn, S.side);
+
         if (S.lastMove) {
             document.querySelectorAll('.is-current')
                 .forEach(el => el.classList.remove('is-current'));
@@ -36,10 +39,21 @@ export function attachMatchListener(matchRef) {
 
         }
 
-        if (S.lastMove) {
-            highlightCheck();
+        // if (S.lastMove) {
+        //     highlightCheck();
+        // }
+        const squares = document.querySelectorAll('.square');
+        squares.forEach(sq => {
+            sq.classList.remove('is-check');
+        })
+        if (S.check) {
+            const squares = document.querySelectorAll('.square');
+            squares.forEach(sq => {
+                if (sq.dataset.value == S.check.posKing) {
+                    sq.classList.add('is-check');
+                }
+            })
         }
-
         S.gTimeW = timeW;
         S.gTimeB = timeB;
         clearTimers();
@@ -52,8 +66,8 @@ export function attachMatchListener(matchRef) {
                 showResult('lose');
             }
             lockBoard();
-            enterReplayMode('replay',S.History.length);
-            S.replayIndex=S.History.length-1;
+            enterReplayMode('replay', S.History.length);
+            S.replayIndex = S.History.length - 1;
         }
 
 

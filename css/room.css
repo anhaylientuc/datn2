@@ -262,10 +262,11 @@ body {
 /* Desktop */
 @media (min-width: 880px) {
   .room-wrap {
-    grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.2fr);
-    align-items: flex-start;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1.6fr);
+    /* hoặc 1.7fr nếu màn to */
   }
 }
+
 
 /* ===== Board + players shell ===== */
 
